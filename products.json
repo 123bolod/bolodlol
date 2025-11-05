@@ -1,10 +1,10 @@
 {
   "settings": {
-    "adminEmail": "mdipml000@gmail.com",
-    "adminPass": "daud@2025",
-    "publicLink": "https://raw.githubusercontent.com/123bolod/bolodlol/main/products.json",
     "syncEndpoint": "https://bolodlol.vercel.app/api/update-products",
     "syncAppKey": "",
+    "publicLink": "https://raw.githubusercontent.com/123bolod/bolodlol/main/products.json",
+    "adminEmail": "mdipml000@gmail.com",
+    "adminPass": "daud@2025",
     "whatsapp": "+8801980196592",
     "messenger": "https://www.facebook.com/share/17gk4yxF3h/",
     "currency": "Tk",
