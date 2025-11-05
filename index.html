@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Daud Store — Single File</title>
+<style>
+  :root{
+    --bg:#0b1220; --card:#101827; --muted:#a6b0c2; --text:#e8eefc; --primary:#6ee7ff; --accent:#a78bfa;
+    --btn-shadow: rgba(99,102,241,.35);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Helvetica,Arial,sans-serif;color:var(--text);background:linear-gradient(180deg,#0b1220,#0b1220 60%,#0e1220)}
+  header{position:sticky;top:0;z-index:50;backdrop-filter:saturate(140%) blur(10px);background:rgba(11,18,32,.65);border-bottom:1px solid rgba(255,255,255,.06)}
+  .wrap{max-width:1000px;margin-inline:auto;padding:14px 14px}
+  .bar{display:flex;align-items:center;gap:10px}
+  .bar h1{font-size:18px;margin:0 10px 0 0;letter-spacing:.3px}
+  .spacer{flex:1}
+  main{max-width:1000px;margin: 12px auto 80px; padding: 0 14px}
+  .pages>section{display:none}
+  .pages>section.active{display:block}
+
+  /* cards */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px}
+  .card{background:linear-gradient(180deg,#111b2f,#0f1628);border:1px solid rgba(255,255,255,.06);border-radius:16px;box-shadow:0 24px 60px rgba(0,0,0,.25), inset 0 -6px 16px rgba(255,255,255,.03);padding:14px}
+  .muted{color:var(--muted);font-size:13px}
+
+  /* 3D buttons */
+  .btn,.pill{cursor:pointer;border:0; color:#06121f; background:linear-gradient(180deg,#e6f9ff,#b7e8ff); border-radius:999px; padding:10px 14px; font-weight:700; letter-spacing:.2px; 
+    box-shadow:0 14px 30px var(--btn-shadow), inset 0 -6px 12px rgba(2,6,23,.22); transform:translateY(0); transition: transform .15s ease, box-shadow .15s ease}
+  .btn.primary{background:linear-gradient(180deg,#dfe6ff,#c7d2fe)}
+  .btn:active,.pill:active{transform:translateY(1px);box-shadow:0 8px 20px var(--btn-shadow), inset 0 -4px 10px rgba(2,6,23,.25)}
+  .btn.small{padding:8px 12px}
+  .btn.ghost{background:linear-gradient(180deg,#f5f7ff,#e8ecff);opacity:.9}
+  .btn.warn{background:linear-gradient(180deg,#ffe7e7,#ffcece)}
+
+  /* infinite pulse for primary */
+  @keyframes threedPulse{0%{transform:translateY(0) scale(1); box-shadow:0 14px 30px var(--btn-shadow), inset 0 -6px 12px rgba(2,6,23,.22)}50%{transform:translateY(-1px) scale(1.015); box-shadow:0 22px 44px var(--btn-shadow), inset 0 -8px 14px rgba(2,6,23,.26)}100%{transform:translateY(0) scale(1); box-shadow:0 14px 30px var(--btn-shadow), inset 0 -6px 12px rgba(2,6,23,.22)}}
+  .btn.primary,.pill.primary{animation:threedPulse 2.8s ease-in-out infinite}
+
+  .row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  input,textarea{width:100%; background:#0b1324; border:1px solid rgba(255,255,255,.08); color:var(--text); padding:10px 12px; border-radius:12px}
+  label{font-size:13px;color:var(--muted)}
+  .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+  .pill{font-size:12px;padding:8px 10px}
+
+  .top-actions{display:flex;gap:8px}
+  .nav{display:flex;gap:8px;flex-wrap:wrap}
+  .nav .btn{background:linear-gradient(180deg,#f5f7ff,#dee9ff)}
+
+  /* modal */
+  .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.5)}
+  .modal.show{display:flex}
+  .modal .box{width:min(92vw,560px);background:linear-gradient(180deg,#0f1628,#0e1424);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:16px}
+
+  .foot{position:fixed;bottom:0;left:0;right:0;display:flex;align-items:center;justify-content:center;padding:12px;gap:8px;background:linear-gradient(180deg,transparent,rgba(0,0,0,.6))}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <h1>Daud Store</h1>
+    <div class="nav">
+      <button class="btn small" onclick="goto('home')">Home</button>
+      <button class="btn small" onclick="goto('products')">Products</button>
+      <button class="btn small" onclick="goto('feedback')">Feedback</button>
+      <button class="btn small" onclick="goto('contact')">Contact</button>
+    </div>
+    <div class="spacer"></div>
+    <div class="top-actions">
+      <button id="quickShareBtn" class="btn small">Share</button>
+      <button id="adminOpenBtn" class="btn primary small">Admin</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="pages">
+    <section id="home" class="active">
+      <div class="grid" id="homeGrid"></div>
+    </section>
+
+    <section id="products">
+      <div class="grid" id="productsGrid"></div>
+    </section>
+
+    <section id="feedback">
+      <div class="card">
+        <h3 style="margin:6px 0 10px">Give Feedback</h3>
+        <div class="row">
+          <select id="fbProductSelect" style="flex:1; min-width:200px"></select>
+          <input id="fbName" placeholder="Your name" style="flex:1;min-width:170px" />
+        </div>
+        <textarea id="fbText" rows="4" placeholder="Write feedback..."></textarea>
+        <div class="actions">
+          <button class="btn primary" onclick="saveFeedback()">Submit</button>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:12px">
+        <div class="row" style="justify-content:space-between">
+          <div><strong>All Feedback</strong></div>
+          <div class="row">
+            <button class="btn ghost" onclick="renderFeedback()">Refresh</button>
+          </div>
+        </div>
+        <div id="feedbackList" class="grid" style="grid-template-columns:repeat(auto-fill,minmax(260px,1fr))"></div>
+      </div>
+    </section>
+
+    <section id="contact">
+      <div class="card">
+        <div class="row">
+          <div style="flex:1">
+            <label>WhatsApp (country + number)</label>
+            <div class="row">
+              <input id="waCountry" placeholder="+880" style="max-width:120px">
+              <input id="waNumber" placeholder="1XXXXXXXXX">
+            </div>
+          </div>
+          <div style="flex:1">
+            <label>Messenger Link</label>
+            <input id="msLink" placeholder="https://m.me/yourpage">
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn primary" onclick="saveContacts()">Save Contacts</button>
+          <button class="btn" onclick="openContacts()">Open</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="admin">
+      <div class="card">
+        <div class="row" style="justify-content:space-between;align-items:center">
+          <div><strong>Admin Panel</strong></div>
+          <div class="row"><button class="btn warn small" id="adminCloseBtn">Close</button></div>
+        </div>
+      </div>
+
+      <div class="card" id="adminAlert" style="display:none"></div>
+
+      <div class="card">
+        <label><strong>Website Public URL</strong></label>
+        <input id="publicSiteUrlInput" placeholder="https://bolodlol.vercel.app">
+        <div class="actions">
+          <button class="btn" onclick="saveWebsiteUrl()">Save Website URL</button>
+          <button class="btn" onclick="copyWebsiteUrl()">Copy</button>
+        </div>
+        <p class="muted">এটাই শেয়ার হবে (RAW JSON নয়)।</p>
+      </div>
+
+      <div class="card">
+        <label><strong>Remote products.json URL (RAW)</strong></label>
+        <input id="remoteUrl" placeholder="https://raw.githubusercontent.com/USER/REPO/BRANCH/products.json">
+        <div class="actions">
+          <button class="btn" onclick="saveRemoteURL()">Save URL</button>
+          <button class="btn primary" onclick="pullFromRemote()">Pull Now</button>
+        </div>
+        <p class="muted">Supports either an array or <code>{ settings, products }</code>.</p>
+      </div>
+
+      <div class="card">
+        <label><strong>Sync Endpoint (serverless URL)</strong></label>
+        <input id="syncEndpointInput" placeholder="https://bolodlol.vercel.app/api/update-products">
+        <label><strong>App Key (optional)</strong></label>
+        <input id="syncAppKeyInput" placeholder="APP_KEY for X-App-Key or ?app_key=">
+        <div class="actions">
+          <button class="btn" onclick="saveSyncEndpoint()">Save Endpoint</button>
+          <button class="btn primary" onclick="testPush()">Test Push</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="row" style="justify-content:space-between;align-items:center">
+          <div><strong>Registered Users</strong></div>
+          <div class="muted" id="usersCount"></div>
+        </div>
+        <div id="usersList" class="grid" style="grid-template-columns:repeat(auto-fill,minmax(240px,1fr))"></div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<!-- Share Modal (fallback) -->
+<div class="modal" id="shareModal">
+  <div class="box">
+    <div class="row" style="justify-content:space-between;align-items:center">
+      <div><strong>Share</strong></div>
+      <button class="btn small" onclick="closeShare()">Close</button>
+    </div>
+    <div class="actions" style="margin-top:10px">
+      <button class="btn" onclick="shareVia('wa')">WhatsApp</button>
+      <button class="btn" onclick="shareVia('ms')">Messenger</button>
+      <button class="btn" onclick="copyWebsiteUrl()">Copy Link</button>
+    </div>
+  </div>
+</div>
+
+<div class="foot">
+  <button class="pill" onclick="goto('home')">Home</button>
+  <button class="pill" onclick="goto('products')">Products</button>
+  <button class="pill" onclick="goto('feedback')">Feedback</button>
+  <button class="pill" onclick="goto('contact')">Contact</button>
+</div>
+
+<script>
+  // ---------------- Keys & helpers ----------------
+  const LS_KEYS = { PRODUCTS: 'daudProducts', FEEDBACK: 'daudFeedback', USERS: 'daudUsers', SITE: 'site' };
+  const pages = ['home','products','feedback','contact','admin'].map(id=>document.getElementById(id));
+  const shareModal=document.getElementById('shareModal');
+  const adminOpenBtn=document.getElementById('adminOpenBtn');
+  const adminCloseBtn=document.getElementById('adminCloseBtn');
+  const usersCount=document.getElementById('usersCount');
+  const usersList=document.getElementById('usersList');
+
+  const fbProductSelect=document.getElementById('fbProductSelect');
+  const fbName=document.getElementById('fbName');
+  const fbText=document.getElementById('fbText');
+
+  const remoteUrlInput=document.getElementById('remoteUrl');
+  const syncEndpointInput=document.getElementById('syncEndpointInput');
+  const syncAppKeyInput=document.getElementById('syncAppKeyInput');
+
+  const publicLinkInput=document.getElementById('publicLinkInput'); // backward compat (not visible here)
+  const publicSiteUrlInput=document.getElementById('publicSiteUrlInput');
+
+  const waCountry=document.getElementById('waCountry');
+  const waNumber=document.getElementById('waNumber');
+  const msLink=document.getElementById('msLink');
+
+  function goto(id){ pages.forEach(p=>p.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+  function toast(msg){ const a=document.getElementById('adminAlert'); if(!a) return; a.textContent=msg; a.style.display='block'; setTimeout(()=>a.style.display='none', 1800); }
+  function copyToClipboard(t){ navigator.clipboard?.writeText(t).then(()=>toast('Copied')).catch(()=>{ prompt('Copy link', t); }); }
+
+  function getCookie(name){ try{ const m=document.cookie.match('(?:^|; )'+name.replace(/([.$?*|{}()\[\]\\\/\+^])/g,'\\$1')+'=([^;]*)'); return m?decodeURIComponent(m[1]):null }catch(e){ return null } }
+  const Storage={ set:(k,v)=>{try{document.cookie=`${k}=${encodeURIComponent(v)}; max-age=${60*60*24*365}; path=/`; }catch(_){} } };
+
+  // ---------------- Products ----------------
+  function getProducts(){ try{ return JSON.parse(localStorage.getItem(LS_KEYS.PRODUCTS)||'[]'); }catch(_){ return [] } }
+  function setProducts(list){ localStorage.setItem(LS_KEYS.PRODUCTS, JSON.stringify(list||[])); }
+
+  function createProductCard(item){
+    const el=document.createElement('div'); el.className='card';
+    el.innerHTML=`<div style="font-weight:700;margin-bottom:6px">${item.name||'Unnamed'}</div>
+      <div class="muted" style="min-height:36px">${item.desc||''}</div>
+      <div class="row" style="justify-content:space-between;margin-top:8px">
+        <div><strong>${item.price?('৳ '+item.price):''}</strong></div>
+      </div>`;
+    const actions=document.createElement('div'); actions.className='actions';
+    const shareBtn=chip('Share',()=>quickShare()); actions.appendChild(shareBtn);
+    const fbBtn=chip('Feedback',()=>{ selectFeedbackProduct(item); goto('feedback'); }); actions.appendChild(fbBtn);
+    el.appendChild(actions);
+    return el;
+  }
+  function chip(txt,fn){ const b=document.createElement('button'); b.className='pill primary'; b.textContent=txt; b.onclick=fn; return b }
+
+  function renderProducts(){ const g=document.getElementById('productsGrid'); g.innerHTML=''; getProducts().forEach(p=>g.appendChild(createProductCard(p))); const h=document.getElementById('homeGrid'); h.innerHTML=''; getProducts().slice(0,6).forEach(p=>h.appendChild(createProductCard(p))); renderFbProductOptions(); }
+
+  // ---------------- Feedback ----------------
+  function getFeedback(){ try{ return JSON.parse(localStorage.getItem(LS_KEYS.FEEDBACK)||'[]'); }catch(_){ return [] } }
+  function setFeedback(list){ localStorage.setItem(LS_KEYS.FEEDBACK, JSON.stringify(list||[])); }
+  function renderFbProductOptions(){ fbProductSelect.innerHTML=''; getProducts().forEach(p=>{ const o=document.createElement('option'); o.value=p.id||p.name; o.textContent=p.name; fbProductSelect.appendChild(o); }); }
+  function selectFeedbackProduct(item){ renderFbProductOptions(); const opt=[...fbProductSelect.options].find(o=>o.textContent===item.name); if(opt){ fbProductSelect.value=opt.value; } }
+  function saveFeedback(){ const id=fbProductSelect.value; const name=(fbName.value||'Anonymous').trim(); const text=(fbText.value||'').trim(); if(!id||!text) return alert('Select product & write something'); const list=getFeedback(); list.push({ id, name, text, ts:Date.now() }); setFeedback(list); fbText.value=''; renderFeedback(); toast('Thanks for your feedback!'); }
+  function renderFeedback(){ const box=document.getElementById('feedbackList'); box.innerHTML=''; getFeedback().slice().reverse().forEach(f=>{ const c=document.createElement('div'); c.className='card'; const t=new Date(f.ts).toLocaleString(); c.innerHTML=`<div style="font-weight:600">${f.name}</div><div class="muted" style="margin:6px 0">${t}</div><div>${f.text}</div>`; box.appendChild(c); }); }
+
+  // ---------------- Contacts ----------------
+  function saveContacts(){ const cc=(waCountry.value||''); const nn=(waNumber.value||''); const digits=String(cc+nn).replace(/\D/g,''); const saved=loadSite(); saved.whatsapp=digits; saved.messenger=(msLink.value||'').trim(); saveSite(saved); toast('Contacts saved'); }
+  function openContacts(){ const s=loadSite(); const n=String(s.whatsapp||'').replace(/\D/g,''); const wa=n?('https://wa.me/'+n):''; const ms=s.messenger||''; if(wa) window.open(wa,'_blank'); else if(ms) window.open(ms,'_blank'); else alert('No contact set'); }
+
+  // ---------------- Users (local) ----------------
+  function getUsers(){ try{ return JSON.parse(localStorage.getItem(LS_KEYS.USERS)||'[]'); }catch(_){ return [] } }
+  function setUsers(list){ localStorage.setItem(LS_KEYS.USERS, JSON.stringify(list||[])); }
+  function addUser(email){ email=String(email||'').trim(); if(!email) return; const list=getUsers(); if(!list.includes(email)) list.push(email); setUsers(list); renderUsers(); }
+  function renderUsers(){ const list=getUsers(); usersCount.textContent = `Total: ${list.length}`; usersList.innerHTML=''; list.forEach(e=>{ const c=document.createElement('div'); c.className='card'; const isG=e.toLowerCase().endsWith('@gmail.com'); c.innerHTML=`<div style="font-weight:600">${e}</div><div class="muted">${isG?'Gmail ✅':'Other'}</div>`; usersList.appendChild(c); }); }
+
+  // ---------------- Site settings (persist) ----------------
+  function loadSite(){ try{ const raw= localStorage.getItem(LS_KEYS.SITE) || getCookie(LS_KEYS.SITE) || '{}'; return JSON.parse(raw||'{}'); }catch(_){ return {} } }
+  function saveSite(obj){ localStorage.setItem(LS_KEYS.SITE, JSON.stringify(obj||{})); try{ Storage.set(LS_KEYS.SITE, JSON.stringify(obj||{})); }catch(_){} }
+
+  function saveWebsiteUrl(){ const v=(publicSiteUrlInput.value||'').trim(); if(!v) return alert('Enter your website URL'); const s=loadSite(); s.publicSiteUrl=v; saveSite(s); toast('Website URL saved'); }
+  function copyWebsiteUrl(){ const s=loadSite(); const url=s.publicSiteUrl || location.origin; copyToClipboard(url); }
+
+  // Remote pull
+  function saveRemoteURL(){ const url=(remoteUrlInput.value||'').trim(); if(!url) return alert('Set RAW URL'); const s=loadSite(); s.publicLink=url; localStorage.setItem('remoteProductsUrl', url); saveSite(s); toast('Remote URL saved'); }
+  async function pullFromRemote(){ const s=loadSite(); const url=(remoteUrlInput.value||s.publicLink||localStorage.getItem('remoteProductsUrl')||'').trim(); if(!url) return alert('Set RAW URL first'); try{ const res=await fetch(url,{cache:'no-store'}); if(!res.ok) throw new Error('HTTP '+res.status); const data=await res.json(); let products=[], settings=null; if(Array.isArray(data)) { products=data; } else if(data && (Array.isArray(data.products)||typeof data.settings==='object')){ products=data.products||[]; settings=data.settings||null; } else { throw new Error('Unsupported JSON'); } setProducts(products); if(settings){ const saved=loadSite(); Object.assign(saved, settings); saveSite(saved); } renderProducts(); toast('Pulled '+products.length+' products'); }catch(e){ alert('Pull failed: '+e.message); } }
+
+  // Sync push
+  function saveSyncEndpoint(){ const s=loadSite(); s.syncEndpoint=(syncEndpointInput.value||'').trim(); s.syncAppKey=(syncAppKeyInput.value||'').trim(); saveSite(s); toast('Endpoint saved'); }
+  async function testPush(){ const s=loadSite(); const endpoint=(syncEndpointInput.value||s.syncEndpoint||'').trim(); const appKey=(syncAppKeyInput.value||s.syncAppKey||'').trim(); if(!endpoint) return alert('Set endpoint first'); const payload = buildPayload(); try{ const headers={'Content-Type':'application/json'}; if(appKey) headers['X-App-Key']=appKey; const r=await fetch(endpoint,{method:'POST',headers,body:JSON.stringify(payload)}); const t=await r.text(); if(r.ok){ toast('Test Push OK'); } else { alert('Failed: '+r.status+' '+t); } }catch(e){ alert('Push error: '+e.message); } }
+  function buildPayload(){ return { settings: loadSite(), products: getProducts() } }
+
+  // Share
+  function currentShareUrl(){ const s=loadSite(); return s.publicSiteUrl || s.publicLink || location.href }
+  function quickShare(){ const url=currentShareUrl(); const data={ title: document.title||'Daud Store', text:'Check this out', url }; if(navigator.share){ navigator.share(data).catch(()=>{}); } else { shareModal.classList.add('show'); } }
+  function closeShare(){ shareModal.classList.remove('show') }
+  function shareVia(kind){ const url=currentShareUrl(); if(kind==='wa') window.open('https://wa.me/?text='+encodeURIComponent(url),'_blank'); else if(kind==='ms') window.open('https://m.me/?link='+encodeURIComponent(url),'_blank'); }
+
+  // Demo auth to collect users (you can replace with real login)
+  function demoLogin(){ const mail=prompt('Enter email to simulate login'); if(mail) addUser(mail); }
+
+  // Init
+  function init(){
+    // restore inputs
+    const s=loadSite(); if(publicSiteUrlInput) publicSiteUrlInput.value = s.publicSiteUrl || location.origin;
+    if(remoteUrlInput) remoteUrlInput.value = s.publicLink || localStorage.getItem('remoteProductsUrl') || '';
+    if(syncEndpointInput) syncEndpointInput.value = s.syncEndpoint || '';
+    if(syncAppKeyInput) syncAppKeyInput.value = s.syncAppKey || '';
+
+    // demo: seed products if empty
+    if(getProducts().length===0){ setProducts([
+      {id:'p1', name:'Wireless Earbuds', price:1200, desc:'BT 5.3, ENC, 30h battery'},
+      {id:'p2', name:'Smart Watch', price:2200, desc:'Heart-rate, SpO₂, GPS'},
+      {id:'p3', name:'Phone Case', price:350, desc:'TPU, MagSafe compatible'}
+    ]); }
+
+    renderProducts(); renderUsers(); renderFeedback();
+
+    document.getElementById('adminOpenBtn').onclick=()=>goto('admin');
+    document.getElementById('adminCloseBtn').onclick=()=>goto('home');
+    document.getElementById('quickShareBtn').onclick=quickShare;
+  }
+  if(document.readyState!=='loading') init(); else document.addEventListener('DOMContentLoaded', init);
+</script>
+
+<!-- Simple demo login button floating for quick test (remove in prod) -->
+<script>
+  const demoBtn=document.createElement('button');
+  demoBtn.textContent='Demo Login';
+  demoBtn.className='btn small';
+  demoBtn.style.position='fixed'; demoBtn.style.right='12px'; demoBtn.style.bottom='64px';
+  demoBtn.onclick=demoLogin; document.body.appendChild(demoBtn);
+</script>
+</body>
+</html>
