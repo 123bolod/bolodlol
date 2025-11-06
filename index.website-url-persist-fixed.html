@@ -1,0 +1,1233 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>দাউদ স্টোর — Daud Store</title>
+  <meta name="description" content="দাউদ স্টোর - single-file responsive e-commerce (admin upload, feedback with product image, pagination).">
+  <style>
+    :root{ --bg:#f8fafc; --card:#fff; --muted:#6b7280; --accent:#ff7a00; --accent-2:#ff9a33; --shadow:0 10px 30px rgba(2,6,23,0.06); --radius:12px; --btn-shadow: rgba(255,122,0,.45);}
+    *{box-sizing:border-box} html,body{height:100%} body{margin:0;font-family:Inter,system-ui,Arial;color:#0f172a;background:var(--bg);-webkit-font-smoothing:antialiased}
+    .topbar{position:sticky;top:0;z-index:120;display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;box-shadow:0 6px 20px rgba(0,0,0,0.08)}
+    .brand-left{display:flex;align-items:center;gap:12px}
+    #siteLogo{width:52px;height:52px;border-radius:10px;background:#fff;padding:6px;object-fit:contain;box-shadow:var(--shadow)}
+    .brand-title{font-weight:800;font-size:1.05rem}.brand-sub{font-size:12px;opacity:.95}
+    .nav{display:flex;gap:12px;align-items:center}.nav a{font-weight:700;color:rgba(255,255,255,0.95);padding:8px 10px;border-radius:8px}.nav a:hover{background:rgba(255,255,255,0.06)}
+    .top-actions{display:flex;gap:8px;align-items:center}
+
+    /* Base buttons (will be overridden by 3D styles below) */
+    .btn{padding:8px 12px;border-radius:10px;border:none;cursor:pointer;font-weight:700;background:#fff;color:var(--accent)}
+    .btn.ghost{background:transparent;color:#fff;border:1px solid rgba(255,255,255,0.12)} .btn.small{padding:6px 8px;font-size:.9rem}
+    .btn.primary{background:var(--accent);color:#fff}
+    .pill{padding:6px 10px;border-radius:999px;border:none;background:#fff;color:var(--accent);font-weight:700}
+    .pagination{display:flex;gap:8px;justify-content:center;margin-top:12px}.page-btn{padding:8px 12px;border-radius:10px;border:1px solid #eee;background:var(--card);cursor:pointer}
+
+    /* Layout */
+    main{padding:16px;max-width:1200px;margin:0 auto}
+    .hero{display:flex;flex-direction:column;gap:12px}
+    .hero-top{display:flex;align-items:center;gap:12px;justify-content:space-between}
+    .logo-box{display:flex;align-items:center;gap:12px}
+    .hero-center{flex:1;text-align:center}
+    .rotating-text{font-size:1.1rem;font-weight:800;color:var(--accent);min-height:48px;display:flex;align-items:center;justify-content:center}
+    .top-three{display:flex;gap:10px;justify-content:center;flex-wrap:nowrap;overflow:hidden}
+    .small-card{flex:0 0 28%;min-width:90px;height:110px;background:var(--card);border-radius:12px;display:flex;align-items:center;justify-content:center;padding:8px;box-shadow:var(--shadow);cursor:pointer}
+    .small-card img{max-width:100%;max-height:100%;object-fit:contain}
+    .slider{width:100%;height:220px;background:var(--card);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center}
+    .slides{display:flex;height:100%;transition:transform .6s ease}
+    .slide{min-width:100%;height:100%;display:flex;align-items:center;justify-content:center;padding:12px}
+    .slide img{max-height:180px;max-width:90%;object-fit:contain;border-radius:10px}
+    .dots{display:flex;gap:8px;justify-content:center;margin-top:8px}.dot{width:10px;height:10px;border-radius:50%;background:rgba(0,0,0,0.12);cursor:pointer}.dot.active{background:var(--accent)}
+    .section{margin-top:18px} .section h2{margin:0 0 6px 0}
+    .products-grid{display:grid;gap:14px;grid-template-columns:repeat(3,1fr)}
+    .product-card{background:var(--card);border-radius:12px;padding:12px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:8px;align-items:center}
+    .product-card img{width:100%;height:160px;object-fit:contain;border-radius:8px}
+    .product-meta{width:100%;text-align:center}.product-meta h4{margin:6px 0 4px 0;font-size:1rem}.product-meta p{margin:0;color:var(--muted);font-size:.95rem}
+    .card-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:8px}
+    .center-card{background:var(--card);padding:16px;border-radius:12px;box-shadow:var(--shadow);margin:16px 0}
+    .cart-item{display:flex;gap:12px;align-items:center;justify-content:space-between;border-radius:10px;padding:10px;background:#fff}
+    .cart-item img{height:72px;width:72px;object-fit:contain;border-radius:8px}
+    .feedback-list{display:flex;flex-direction:column;gap:10px;margin-top:12px}.fb-item{background:#fff;padding:10px;border-radius:10px;box-shadow:var(--shadow)}
+    .admin-panel{position:fixed;right:-520px;top:80px;width:520px;background:var(--card);border-radius:12px;padding:14px;box-shadow:0 30px 60px rgba(2,6,23,0.12);transition:right .35s;z-index:220;max-height:82vh;overflow:auto}
+    .admin-panel.active{right:16px}.admin-row{display:flex;flex-direction:column;gap:8px;margin-top:10px}.admin-row input,.admin-row textarea,.admin-row select{padding:10px;border-radius:8px;border:1px solid #eee}
+    .modal{display:none;position:fixed;inset:0;background:rgba(2,6,23,0.45);align-items:center;justify-content:center;z-index:300;padding:18px}.modal.show{display:flex}
+    .modal-card{background:var(--card);padding:16px;border-radius:12px;box-shadow:var(--shadow);max-width:720px;width:100%;position:relative}.modal-close{position:absolute;right:8px;top:8px;border:none;background:transparent;font-size:18px;cursor:pointer}
+    .muted{color:var(--muted)} .hidden{display:none} .page{display:none}.page.active{display:block}
+    .avatar{ width:36px;height:36px;border-radius:50%; object-fit:cover;background:#fff;box-shadow:var(--shadow); border:2px solid rgba(255,255,255,.8); }
+
+    /* 3D + Animated Buttons (overrides) */
+    .btn, .pill, .page-btn{
+      position:relative;
+      padding:10px 14px;
+      border-radius:12px;
+      border:none;
+      font-weight:800;
+      letter-spacing:.2px;
+      background: linear-gradient(180deg,#ffffff,#f1f5f9);
+      color:#0f172a;
+      box-shadow:
+        0 12px 26px rgba(2,6,23,.10),
+        0 8px 12px rgba(2,6,23,.06),
+        inset 0 1px 0 rgba(255,255,255,.9),
+        inset 0 -4px 8px rgba(2,6,23,.08);
+      transform: translateZ(0);
+      transition: transform .18s cubic-bezier(.2,.9,.25,1), box-shadow .18s, filter .3s;
+      cursor:pointer;
+      user-select:none;
+    }
+    .btn::after, .pill::after, .page-btn::after{
+      content:""; position:absolute; inset:0; border-radius:inherit;
+      background: radial-gradient(ellipse at 50% 0%, rgba(255,255,255,.45), rgba(255,255,255,0) 60%);
+      pointer-events:none; mix-blend-mode: screen;
+    }
+    .btn.wave::before, .pill.wave::before, .page-btn.wave::before{
+      content:""; position:absolute; inset:-2px; border-radius:inherit;
+      background: conic-gradient(from 0deg at 50% 50%, rgba(255,255,255,.2), rgba(255,255,255,0) 25%, rgba(255,255,255,.2) 50%, rgba(255,255,255,0) 75%, rgba(255,255,255,.2) 100%);
+      filter: blur(10px); opacity:0; transition:opacity .35s ease;
+    }
+    .btn.wave:hover::before, .pill.wave:hover::before, .page-btn.wave:hover::before{ opacity:1; }
+    .btn:hover, .pill:hover, .page-btn:hover{
+      transform: translateY(-4px) scale(1.02);
+      box-shadow: 0 22px 40px rgba(2,6,23,.18), inset 0 -6px 10px rgba(2,6,23,.12);
+    }
+    .btn:active, .pill:active, .page-btn:active{
+      transform: translateY(0) scale(.98);
+      box-shadow: 0 12px 24px rgba(2,6,23,.14), inset 0 -2px 6px rgba(2,6,23,.25);
+    }
+    .btn.primary, .pill.primary, .page-btn.active{
+      background: linear-gradient(180deg, var(--accent-2), var(--accent));
+      color:#fff;
+      box-shadow:
+        0 14px 30px var(--btn-shadow),
+        0 10px 14px rgba(2,6,23,.12),
+        inset 0 1px 0 rgba(255,255,255,.28),
+        inset 0 -6px 12px rgba(2,6,23,.22);
+    }
+    .pill.warn{ /* Edit */
+      background: linear-gradient(180deg,#fbbf24,#f59e0b);
+      color:#fff;
+      box-shadow: 0 12px 24px rgba(245,158,11,.35), inset 0 -6px 12px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.25);
+    }
+    .pill.danger,
+    .pill[data-del]{
+      background: linear-gradient(180deg,#ef4444,#dc2626) !important;
+      color:#fff !important;
+      box-shadow: 0 12px 24px rgba(239,68,68,.35), inset 0 -6px 12px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.25) !important;
+    }
+
+    @media (max-width:1000px){.products-grid{grid-template-columns:repeat(2,1fr)}.small-card{flex:0 0 32%}}
+    @media (max-width:640px){.nav{display:none}.top-three{gap:8px;overflow:auto;padding:6px}.small-card{flex:0 0 30%}.slider{height:180px}.product-card img{width:100%;height:auto;max-height:140px}.products-grid{grid-template-columns:repeat(1,1fr)}.hero-top{flex-direction:column;align-items:center;gap:8px}main{padding:12px}.admin-panel{width:94%}.topbar{flex-wrap:wrap;gap:8px}.top-actions{flex-wrap:wrap;width:100%;justify-content:center}.top-actions .btn{flex:1 1 calc(50% - 12px);margin-top:6px}}
+  
+/* NAV 3D ENHANCED */
+.nav .nav-link{
+  position:relative;
+  display:inline-block;
+  padding:8px 12px;
+  border-radius:12px;
+  font-weight:800;
+  letter-spacing:.2px;
+  background: linear-gradient(180deg,#ffffff,#f1f5f9);
+  color:#0f172a !important;
+  box-shadow:
+    0 12px 26px rgba(2,6,23,.10),
+    0 8px 12px rgba(2,6,23,.06),
+    inset 0 1px 0 rgba(255,255,255,.9),
+    inset 0 -4px 8px rgba(2,6,23,.08);
+  transition: transform .18s cubic-bezier(.2,.9,.25,1), box-shadow .18s;
+}
+.nav .nav-link:after{
+  content:""; position:absolute; inset:0; border-radius:inherit;
+  background: radial-gradient(ellipse at 50% 0%, rgba(255,255,255,.45), rgba(255,255,255,0) 60%);
+  pointer-events:none; mix-blend-mode: screen;
+}
+.nav .nav-link:hover{ transform:translateY(-3px); box-shadow:0 22px 40px rgba(2,6,23,.18), inset 0 -6px 10px rgba(2,6,23,.12); }
+.nav .nav-link:active{ transform:translateY(0); box-shadow:0 12px 24px rgba(2,6,23,.14), inset 0 -2px 6px rgba(2,6,23,.25); }
+@media (max-width:640px){
+  .nav{ display:flex !important; flex-wrap:wrap; gap:8px }
+  .nav .nav-link{ flex:1 1 calc(50% - 8px); text-align:center }
+}
+
+/* Sticky 3D footer nav */
+#footbar{
+  position:fixed; left:0; right:0; bottom:10px; z-index:250;
+  display:flex; gap:8px; justify-content:center; flex-wrap:wrap;
+  padding:8px 12px; pointer-events:none;
+}
+#footbar .fb-wrap{ background:rgba(255,255,255,0.85); backdrop-filter:saturate(150%) blur(8px);
+  border-radius:14px; padding:8px; box-shadow: 0 10px 30px rgba(15,23,42,.18); pointer-events:auto; display:flex; gap:8px; }
+#footbar .pill{ min-width:86px; text-align:center }
+@media (max-width:640px){ #footbar .pill{ flex:1 1 calc(50% - 8px) } }
+
+/* FOOTBAR ACTIVE HIGHLIGHT */
+#footbar .pill.active{ 
+  background: linear-gradient(180deg, var(--accent-2), var(--accent)) !important; 
+  color:#fff !important; 
+  box-shadow: 0 14px 30px var(--btn-shadow), 0 10px 14px rgba(2,6,23,.12), inset 0 1px 0 rgba(255,255,255,.28), inset 0 -6px 12px rgba(2,6,23,.22);
+}
+#footbar .pill:hover{ filter:hue-rotate(22deg) saturate(1.2); }
+</style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand-left">
+      <img id="siteLogo" src="" alt="দাউদ স্টোর Logo">
+      <div><div class="brand-title">দাউদ স্টোর</div><div class="brand-sub">Quality • Trust • Fast</div></div>
+    </div>
+    <nav class="nav" aria-label="Main">
+      <a href="#home" class="nav-link">Home</a>
+      <a href="#products" class="nav-link">Products</a>
+      <a href="#cart" class="nav-link">Cart</a>
+      <a href="#contact" class="nav-link">Contact</a>
+      <a href="#feedback" class="nav-link">Feedback</a>
+    </nav>
+    <div class="top-actions">
+      <img id="adminAvatar" class="avatar" alt="Admin" title="Site Admin" />
+      <img id="userAvatar" class="avatar hidden" alt="You" title="You" />
+      <button id="userAuthBtn" class="btn small wave" onclick="document.getElementById('userModal').classList.add('show')">Sign Up / Login</button>
+      <button id="userLogoutBtn" class="btn small hidden wave">Logout</button>
+      <button id="quickShareBtn" class="btn small wave">Share</button>
+      <button id="adminOpenBtn" class="btn primary small wave">Admin</button>
+    </div>
+  </header>
+
+  <div id="adminAlert" class="hidden" style="background:var(--accent);color:#fff;padding:8px 12px;border-radius:8px;position:fixed;top:80px;right:16px;z-index:500;box-shadow:0 4px 12px rgba(0,0,0,0.1);"></div>
+
+  <main>
+    <section id="home" class="page active">
+      <div class="hero">
+        <div class="hero-top">
+          <div class="logo-box"><img id="heroLogo" src="" alt="logo" style="width:64px;height:64px;border-radius:10px;object-fit:contain"></div>
+          <div class="hero-center"><div id="rotatingText" class="rotating-text">স্বাগতম — দাউদ স্টোর</div></div>
+          <div style="width:64px"></div>
+        </div>
+        <div class="top-three" id="topThree"></div>
+        <div class="slider" id="sliderWrap"><div class="slides" id="slides"></div></div>
+        <div class="dots" id="slideDots"></div>
+      </div>
+      <section class="section">
+        <div style="display:flex;justify-content:space-between;align-items:center"><h2>Trending Products</h2><div id="productsCount" class="muted"></div></div>
+        <div id="productsGrid" class="products-grid"></div>
+        <div id="pagination" class="pagination"></div>
+      </section>
+    </section>
+
+    <section id="product-view" class="page"><div class="center-card" id="productViewCard"></div></section>
+
+    <section id="products" class="page">
+      <div class="center-card">
+        <h2>All Products</h2>
+        <input id="productSearchInput" placeholder="পণ্য সার্চ করুন..." style="width:100%;padding:10px;border-radius:8px;border:1px solid #eee;margin-top:6px;margin-bottom:8px" />
+        <div id="productsGridFull" class="products-grid"></div>
+        <div id="paginationFull" class="pagination"></div>
+      </div>
+    </section>
+
+    <section id="cart" class="page">
+      <div class="center-card">
+        <h2>Your Cart</h2>
+        <div id="cartItems" class="card-list"></div>
+        <div style="text-align:center;margin-top:12px"><button id="checkoutBtn" class="btn primary wave">Checkout (Demo)</button></div>
+      </div>
+    </section>
+
+    <section id="contact" class="page">
+      <div class="center-card">
+        <h2>Contact</h2>
+        <p class="muted">Contact via WhatsApp or Messenger (set by admin).</p>
+        <div style="display:flex;gap:10px;justify-content:center;margin-top:12px">
+          <button id="contactWhatsapp" class="btn wave" style="background:#25D366;color:#fff">WhatsApp</button>
+          <button id="contactMessenger" class="btn wave" style="background:#0084FF;color:#fff">Messenger</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="feedback" class="page">
+      <div class="center-card">
+        <h2>Feedback</h2>
+        <div style="margin-top:10px">
+          <h3>Website feedback</h3>
+          <div style="display:flex;gap:8px;justify-content:center;margin-top:8px">
+            <button id="siteGoodBtn" class="btn wave">👍 Good (<span id="goodCount">0</span>)</button>
+            <button id="siteBadBtn" class="btn wave">👎 Bad (<span id="badCount">0</span>)</button>
+          </div>
+        </div>
+        <div style="margin-top:14px">
+          <h3>Product feedback</h3>
+          <label>Search product</label>
+          <input id="feedbackSearch" placeholder="Type product name..." style="width:100%;padding:10px;border-radius:8px;border:1px solid #eee;margin-top:6px" />
+          <div id="feedbackSearchResults" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"></div>
+          <div id="selectedFeedbackProduct" style="display:none;margin-top:12px">
+            <div style="display:flex;gap:10px;align-items:center">
+              <img id="feedbackSelectedImg" src="" alt="" style="height:92px;border-radius:8px;box-shadow:var(--shadow)">
+              <div><strong id="feedbackSelectedName"></strong><br><span id="feedbackSelectedPrice" class="muted"></span></div>
+            </div>
+            <textarea id="feedbackText" placeholder="Write your feedback..." rows="4" style="width:100%;margin-top:10px;padding:10px;border:1px solid #eee;border-radius:8px"></textarea>
+            <div style="display:flex;gap:8px;justify-content:center;margin-top:8px">
+              <button id="submitFeedbackBtn" class="btn primary wave">Submit Feedback</button>
+              <button id="viewFeedbacksBtn" class="btn wave">View All</button>
+            </div>
+          </div>
+          <div id="feedbackList" class="feedback-list" style="margin-top:12px"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <aside id="adminPanel" class="admin-panel" aria-hidden="true">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <h3>Admin Panel</h3>
+      <div><button id="closeAdmin" class="btn small wave">✕</button></div>
+    </div>
+
+    <div class="admin-row admin-only" style="display:none">
+      <label><strong>Upload Logo</strong></label>
+      <input id="logoInput" type="file" accept="image/*" />
+      <button id="logoSetBtn" class="btn wave">Upload Logo</button>
+    </div>
+
+    <div class="admin-row admin-only" style="display:none;margin-top:10px">
+      <label><strong>Upload Product</strong></label>
+      <input id="productImageInput" type="file" accept="image/*" />
+      <input id="productName" type="text" placeholder="Product name" />
+      <input id="productPrice" type="text" placeholder="Price" />
+      <input id="productDesc" type="text" placeholder="Short description" />
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button id="addProductBtn" class="btn primary wave">Add Product</button>
+        <button id="clearProductsBtn" class="btn wave">Clear All</button>
+      </div>
+    </div>
+
+    <div class="admin-row admin-only" style="display:none;margin-top:10px">
+      <label><strong>Animated sentences (comma separated)</strong></label>
+      <textarea id="sentencesInput" placeholder="Welcome!, Best deals!, Fast delivery" rows="3"></textarea>
+      <button id="saveSentencesBtn" class="btn primary wave">Save Sentences</button>
+    </div>
+
+    <div class="admin-row admin-only" style="display:none;margin-top:10px">
+      <label><strong>Currency Symbol (shown on product cards)</strong></label>
+      <input id="currencyInput" type="text" placeholder="৳ or $" />
+      <button id="setCurrencyBtn" class="btn wave">Set Currency</button>
+    </div>
+
+    <div class="admin-row admin-only" style="display:none;margin-top:10px">
+      <label><strong>WhatsApp (country + number)</strong></label>
+      <div style="display:flex;gap:8px">
+        <select id="whatsappCountry">
+          <option value="+880" selected>+880 (BD)</option><option value="+91">+91 (IN)</option>
+          <option value="+1">+1 (US)</option><option value="+44">+44 (UK)</option><option value="+971">+971 (UAE)</option>
+        </select>
+        <input id="whatsappNumber" placeholder="1XXXXXXXXX" />
+      </div>
+      <label style="margin-top:8px"><strong>Messenger link</strong></label>
+      <input id="messengerInput" placeholder="https://m.me/username" />
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button id="saveContactsBtn" class="btn primary wave">Save Contacts</button>
+        <button id="openContactsBtn" class="btn wave">Test Contact</button>
+      </div>
+    </div>
+
+    <div class="admin-row admin-only" style="display:none;margin-top:10px">
+      <label><strong>Share (Admin)</strong></label>
+      <button id="openShare" class="btn wave">Open Share Modal</button>
+    </div>
+
+    <div class="admin-row admin-only" style="display:none;margin-top:10px">
+      <label><strong>Public Link (GitHub Pages)</strong></label>
+    <div class="admin-row admin-only" style="display:none;margin-top:10px">
+      <label><strong>Website Public URL</strong></label>
+      <input id="publicSiteUrlInput" type="text" placeholder="https://bolodlol.vercel.app" />
+      <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+        <button id="saveWebsiteUrlBtn" class="btn wave">Save Website URL</button>
+        <button id="copyWebsiteUrlBtn" class="btn wave">Copy</button>
+      </div>
+      <p class="muted" style="margin-top:6px">This is your site share link (e.g., Vercel domain). Do <b>not</b> put RAW JSON here.</p>
+    </div>
+
+      <input id="publicLinkInput" type="text" placeholder="https://username.github.io/your-site" />
+      <button id="savePublicLinkBtn" class="btn wave">Save Public Link</button>
+    </div>
+
+    <!-- Registered Users (sibling section, fixed nesting) -->
+    <div class="admin-row admin-only" style="display:none;margin-top:10px">
+      <label><strong>Registered Users</strong></label>
+      <div id="usersList" class="center-card" style="max-height:220px;overflow:auto"></div>
+    </div>
+
+    <div class="admin-row admin-only" style="display:none;margin-top:10px">
+      <label><strong>Admin Email</strong></label>
+      <input id="changeAdminEmailInput" type="email" placeholder="admin@example.com" />
+      <button id="changeAdminEmailBtn" class="btn wave">Save Admin Email</button>
+    </div>
+
+    <div class="admin-row admin-only" style="display:none;margin-top:10px">
+      <label><strong>Admin Password</strong></label>
+      <input id="changeAdminPassInput" type="password" placeholder="new password" />
+      <button id="changeAdminPassBtn" class="btn wave">Save Admin Password</button>
+    </div>
+
+    <div class="admin-row admin-only" style="display:none;margin-top:10px">
+      <label><strong>Export / Backup</strong></label>
+    <!-- Remote products.json (RAW URL) -->
+    <div class="admin-row admin-only" style="display:none;margin-top:10px">
+      <label><strong>Remote products.json URL (RAW)</strong></label>
+      <input id="remoteUrl" type="text" placeholder="https://raw.githubusercontent.com/123bolod/bolodlol/main/products.json" />
+      <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+        <button id="saveRemoteUrlBtn" class="btn wave">Save URL</button>
+        <button id="pullNowBtn" class="btn wave">Pull Now</button>
+      </div>
+      <p class="muted" style="margin-top:6px">Use a public RAW link (GitHub <code>raw.githubusercontent.com</code>). Supports either an array or <code>{ settings, products }</code>.</p>
+    </div>
+
+    <!-- Serverless Sync (Endpoint + App Key) -->
+    <div class="admin-row admin-only" style="display:none;margin-top:10px">
+      <label><strong>Sync Endpoint (serverless URL)</strong></label>
+      <input id="syncEndpointInput" type="text" placeholder="https://bolodlol.vercel.app/api/update-products" />
+      <label style="margin-top:6px"><strong>App Key (optional)</strong></label>
+      <input id="syncAppKeyInput" type="text" placeholder="APP_KEY for X-App-Key header or ?app_key=" />
+      <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+        <button id="saveSyncEndpointBtn" class="btn wave">Save Endpoint</button>
+        <button id="testPushBtn" class="btn primary wave">Test Push</button>
+      </div>
+    </div>
+
+      <button id="exportJsonBtn" class="btn wave">Download products.json</button>
+      <button id="importJsonBtn" class="btn wave">Import products.json</button>
+      <input id="uploadJsonInput" type="file" accept="application/json" class="hidden" />
+    </div>
+  </aside>
+
+  <div id="adminGateModal" class="modal">
+    <div class="modal-card">
+      <button class="modal-close" data-close onclick="(this.closest('.modal')||this.parentNode).classList.remove('show')">✕</button>
+      <h3>Admin Login</h3>
+      <input id="gateEmail" type="email" placeholder="Admin email" />
+      <input id="gatePass" type="password" placeholder="Admin password" />
+      <div style="display:flex;gap:8px;margin-top:8px"><button id="gateLoginBtn" class="btn primary wave">Login</button></div>
+    </div>
+  </div>
+
+  <div id="shareModal" class="modal">
+    <div class="modal-card">
+      <button class="modal-close" data-close onclick="(this.closest('.modal')||this.parentNode).classList.remove('show')">✕</button>
+      <h3>Share দাউদ স্টোর</h3>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button id="shareWhatsapp" class="btn wave" style="background:#25D366;color:#fff">WhatsApp</button>
+        <button id="shareMessenger" class="btn wave" style="background:#0084FF;color:#fff">Messenger</button>
+        <button id="copyLinkBtn" class="btn wave">Copy Link</button>
+      </div>
+      <p class="muted" style="margin-top:8px">Note: Host on GitHub Pages/Netlify (not file://).</p>
+    </div>
+  </div>
+
+  <div id="userModal" class="modal">
+    <div class="modal-card">
+      <button class="modal-close" data-close onclick="(this.closest('.modal')||this.parentNode).classList.remove('show')">✕</button>
+      <h3>Sign Up / Login</h3>
+      <input id="userEmail" type="email" placeholder="Email" />
+      <input id="userPass" type="password" placeholder="Password" />
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <div class="row" id="rememberUserRow" style="margin:8px 0">
+          <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="rememberMeToggle" /><span>Remember me</span></label>
+        </div>
+        <button id="userSignupBtn" class="btn primary wave" onclick="signupUser()">Sign Up</button>
+        <button id="userLoginBtn" class="btn wave" onclick="loginUser()">Login</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="viewFeedbackModal" class="modal">
+    <div class="modal-card">
+      <button class="modal-close" data-close onclick="(this.closest('.modal')||this.parentNode).classList.remove('show')">✕</button>
+      <h3>All Feedbacks</h3>
+      <div id="allFeedbacks"></div>
+    </div>
+  </div>
+
+  <script>
+      const pages=document.querySelectorAll('.page'); const navLinks=document.querySelectorAll('.nav-link');
+  const siteLogo=document.getElementById('siteLogo'); const heroLogo=document.getElementById('heroLogo'); const rotatingText=document.getElementById('rotatingText');
+  const topThree=document.getElementById('topThree'); const slides=document.getElementById('slides'); const slideDots=document.getElementById('slideDots');
+  const productsGrid=document.getElementById('productsGrid'); const productsGridFull=document.getElementById('productsGridFull'); const pagination=document.getElementById('pagination'); const paginationFull=document.getElementById('paginationFull'); const productsCount=document.getElementById('productsCount');
+  const productViewCard=document.getElementById('productViewCard'); const cartItems=document.getElementById('cartItems');
+  const feedbackSearch=document.getElementById('feedbackSearch'); const feedbackSearchResults=document.getElementById('feedbackSearchResults'); const selectedFeedbackProduct=document.getElementById('selectedFeedbackProduct'); const feedbackSelectedImg=document.getElementById('feedbackSelectedImg'); const feedbackSelectedName=document.getElementById('feedbackSelectedName'); const feedbackSelectedPrice=document.getElementById('feedbackSelectedPrice'); const feedbackText=document.getElementById('feedbackText'); const submitFeedbackBtn=document.getElementById('submitFeedbackBtn'); const viewFeedbacksBtn=document.getElementById('viewFeedbacksBtn'); const allFeedbacks=document.getElementById('allFeedbacks'); const goodCount=document.getElementById('goodCount'); const badCount=document.getElementById('badCount');
+  const publicLinkInput=document.getElementById('publicLinkInput'); const savePublicLinkBtn=document.getElementById('savePublicLinkBtn'); const publicSiteUrlInput=document.getElementById('publicSiteUrlInput'); const saveWebsiteUrlBtn=document.getElementById('saveWebsiteUrlBtn'); const copyWebsiteUrlBtn=document.getElementById('copyWebsiteUrlBtn');
+  const productSearchInput=document.getElementById('productSearchInput'); let filteredProducts=[]; let adminLoggedIn=false; const feedbackList=document.getElementById('feedbackList');
+  const userAuthBtn=document.getElementById('userAuthBtn'); const userLogoutBtn=document.getElementById('userLogoutBtn');
+  if(userAuthBtn){ userAuthBtn.addEventListener('click', ()=>{ if(!currentUser) document.getElementById('userModal').classList.add('show');}); }
+
+  if(userLogoutBtn) userLogoutBtn.addEventListener('click', logoutUser); const adminOpenBtn=document.getElementById('adminOpenBtn'); const adminAvatar=document.getElementById('adminAvatar'); const userAvatar=document.getElementById('userAvatar');
+  const adminPanel=document.getElementById('adminPanel'); const closeAdmin=document.getElementById('closeAdmin');
+  const logoInput=document.getElementById('logoInput'); const logoSetBtn=document.getElementById('logoSetBtn');
+  const productImageInput=document.getElementById('productImageInput'); const productName=document.getElementById('productName'); const productPrice=document.getElementById('productPrice'); const productDesc=document.getElementById('productDesc'); const addProductBtn=document.getElementById('addProductBtn'); const clearProductsBtn=document.getElementById('clearProductsBtn');
+  const viewFeedbacksModal=document.getElementById('viewFeedbackModal'); const userModal=document.getElementById('userModal'); const shareModal=document.getElementById('shareModal');
+  const sentencesInput=document.getElementById('sentencesInput'); const saveSentencesBtn=document.getElementById('saveSentencesBtn'); const currencyInput=document.getElementById('currencyInput'); const setCurrencyBtn=document.getElementById('setCurrencyBtn'); const whatsappCountry=document.getElementById('whatsappCountry'); const whatsappNumber=document.getElementById('whatsappNumber'); const messengerInput=document.getElementById('messengerInput'); const saveContactsBtn=document.getElementById('saveContactsBtn'); const openContactsBtn=document.getElementById('openContactsBtn'); const openShare=document.getElementById('openShare');
+  const changeAdminEmailInput=document.getElementById('changeAdminEmailInput'); const changeAdminEmailBtn=document.getElementById('changeAdminEmailBtn'); const changeAdminPassInput=document.getElementById('changeAdminPassInput'); const changeAdminPassBtn=document.getElementById('changeAdminPassBtn');
+  const adminGateModal=document.getElementById('adminGateModal'); const gateEmail=document.getElementById('gateEmail'); const gatePass=document.getElementById('gatePass'); const gateLoginBtn=document.getElementById('gateLoginBtn');
+
+  // ---- Persistent storage helpers (localStorage + cookie fallback) ----
+  function setCookie(name, value, days){
+    try{
+      var d=new Date(); d.setTime(d.getTime()+days*24*60*60*1000);
+      document.cookie = name + "=" + encodeURIComponent(value) + ";expires=" + d.toUTCString() + ";path=/";
+    }catch(e){}
+  }
+  function getCookie(name){
+    try{
+      var cname = name + "="; var arr = document.cookie.split(';');
+      for(var i=0;i<arr.length;i++){ var c=arr[i].trim(); if(c.indexOf(cname)===0) return decodeURIComponent(c.substring(cname.length)); }
+    }catch(e){}
+    return null;
+  }
+  const Storage = {
+    get: (k, def=null) => {
+      try{ var v = localStorage.getItem(k); if(v!==null) return v; }catch(e){}
+      var cv = getCookie(k); return cv!==null ? cv : def;
+    },
+    set: (k, v) => {
+      try{ localStorage.setItem(k, v); }catch(e){}
+      setCookie(k, v, 365);
+    },
+    remove: (k) => {
+      try{ localStorage.removeItem(k); }catch(e){}
+      setCookie(k, "", -1);
+    }
+  };
+
+  // ---- URL-hash remember fallback ----
+  function _b64e(str){ try{return btoa(unescape(encodeURIComponent(str)));}catch(e){ return btoa(str);} }
+  function _b64d(str){ try{return decodeURIComponent(escape(atob(str)));}catch(e){ return atob(str);} }
+  function urlRememberSet(email, isAdmin){
+    try{
+      var obj = {u: email, a: !!isAdmin, t: Date.now()};
+      var data = _b64e(JSON.stringify(obj));
+      var h = location.hash.replace(/^#/, '');
+      var parts = h ? h.split('&').filter(s=>!s.startsWith('auth=')) : [];
+      parts.push('auth='+data);
+      location.hash = parts.join('&');
+    }catch(e){}
+  }
+  function urlRememberClear(){
+    try{
+      var h = location.hash.replace(/^#/, '');
+      if(!h){ return; }
+      var parts = h.split('&').filter(s=>!s.startsWith('auth='));
+      location.hash = parts.join('&');
+    }catch(e){}
+  }
+  function urlRememberGet(){
+    try{
+      var h = location.hash.replace(/^#/, '');
+      if(!h) return null;
+      var m = h.split('&').find(s=>s.startsWith('auth='));
+      if(!m) return null;
+      var val = m.split('=')[1]||'';
+      if(!val) return null;
+      var obj = JSON.parse(_b64d(val));
+      if(obj && obj.u){ return obj; }
+    }catch(e){}
+    return null;
+  }
+
+  function getSavedSite(){ try{ return JSON.parse(localStorage.getItem(LS_KEYS.SITE)||Storage.get(LS_KEYS.SITE,'{}')||'{}'); }catch(_){ return {}; } }
+
+const LS_KEYS={ REMEMBER_USER:'remember_user', REMEMBER_ADMIN:'remember_admin',  SITE:'daudSite', PRODUCTS:'daudProducts', CART:'daudCart', FEEDBACKS:'daudFeedbacks', SITE_FEEDBACK:'daudSiteFeedback', ADMIN:'daudAdmin', LIKES:'daudLikes', LIKE_COUNTS:'daudLikeCounts', DISLIKE_COUNTS:'daudDislikeCounts', USERS:'daudUsers', CURRENT_USER:'daudCurrentUser', ADMIN_LOGGED_IN:'daudAdminLoggedIn'};
+
+  const DEFAULT_PRODUCTS=[{id:1,name:'Sample Product',price:'100',desc:'This is a sample product for demonstration.',image:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAIAAAD/gAIDAAAA5klEQVR4nO3QQQkAIADAQLV/Z63gXiLcJRibe3BrvQ74iVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWcEBil4Bx/GEGnoAAAAASUVORK5CYII='}];
+  let rotatingSentences=['স্বাগতম — দাউদ স্টোর','Best deals!','Fast delivery']; let currencySymbol='৳'; let whatsappLink=''; let messengerLink=''; let publicLink=''; let users=[]; let currentUser=null; let products=[]; const ITEMS_PER_PAGE=6; let currentPageHome=1; let currentPageFull=1; let cart=[]; let likes=[]; let likeCounts={}; let dislikeCounts={};
+
+  if (document.readyState!=='loading') initApp(); else document.addEventListener('DOMContentLoaded', initApp);
+
+  function initApp(){
+  getDeviceId();
+  try{ const quickShareBtn=document.getElementById('quickShareBtn'); if(quickShareBtn) quickShareBtn.addEventListener('click', quickShare); }catch(e){}
+ setupNavigation(); loadSiteSettings(); loadProducts(); loadCart(); loadLikes(); loadLikeCounts(); setupFeedbackSystem(); autoRotateText(); initAdminPanel(); initUserSystem(); checkAdminPersistentLogin(); if(productSearchInput) productSearchInput.addEventListener('input', handleProductSearch); }
+
+  function setupNavigation(){ function switchPage(target){ pages.forEach(p=>p.classList.remove('active')); document.getElementById(target).classList.add('active'); } navLinks.forEach(link=>{ link.addEventListener('click', e=>{ e.preventDefault(); const href=link.getAttribute('href'); const pageId=href?href.replace('#',''):''; switchPage(pageId||'home'); }); }); switchPage('home'); }
+
+  function loadSiteSettings(){ const saved=getSavedSite(); if(!saved.adminEmail) saved.adminEmail='mdipml000@gmail.com'; if(!saved.adminPass) saved.adminPass='daud@2025'; localStorage.setItem(LS_KEYS.SITE, JSON.stringify(saved)); if(saved.logo){ siteLogo.src=heroLogo.src=saved.logo; } if(saved.sentences){ rotatingSentences=saved.sentences.split(',').map(s=>s.trim()).filter(Boolean);} if(saved.currency){ currencySymbol=saved.currency;} if(saved.whatsapp){ whatsappLink='https://wa.me/'+String(saved.whatsapp).replace(/[^0-9]/g,''); } if(saved.messenger){ messengerLink=saved.messenger;} if(saved.publicLink){ publicLink=saved.publicLink; if(publicLinkInput) publicLinkInput.value=publicLink;} refreshAdminAvatar(); refreshUserUI(); }
+
+  function importSettingsFromRemote(obj){ if(!obj) return; const saved=JSON.parse(localStorage.getItem(LS_KEYS.SITE)||'{}'); ['logo','currency','sentences','whatsapp','messenger','adminEmail','adminPass','publicLink'].forEach(k=>{ if(obj[k]) saved[k]=obj[k]; }); localStorage.setItem(LS_KEYS.SITE, JSON.stringify(saved)); if(saved.logo){ siteLogo.src=heroLogo.src=saved.logo; } if(saved.currency){ currencySymbol=saved.currency;} if(saved.sentences){ rotatingSentences=saved.sentences.split(',').map(s=>s.trim()).filter(Boolean);} if(saved.whatsapp){ whatsappLink='https://wa.me/'+String(saved.whatsapp).replace(/[^0-9]/g,''); } if(saved.messenger){ messengerLink=saved.messenger;} if(saved.publicLink){ publicLink=saved.publicLink; if(publicLinkInput) publicLinkInput.value=publicLink;} refreshAdminAvatar(); }
+
+  function emailAvatar(email,size=64){ const c=document.createElement('canvas'); c.width=c.height=size; const x=c.getContext('2d'); const t=(email||'user@example.com').trim().toLowerCase(); let h=0; for(let i=0;i<t.length;i++){h=((h<<5)-h)+t.charCodeAt(i);h|=0;} const hue=Math.abs(h)%360; x.fillStyle=`hsl(${hue} 70% 55%)`; x.beginPath(); x.arc(size/2,size/2,size/2,0,Math.PI*2); x.fill(); const n=t.split('@')[0]; const ini=n.split(/[._-]+/).slice(0,2).map(s=>s[0]||'').join('').toUpperCase()||'U'; x.fillStyle='#fff'; x.font=`${Math.floor(size*0.45)}px sans-serif`; x.textAlign='center'; x.textBaseline='middle'; x.fillText(ini,size/2,size/2+1); return c.toDataURL('image/png'); }
+  function refreshAdminAvatar(){ const saved=JSON.parse(localStorage.getItem(LS_KEYS.SITE)||'{}'); if(saved.adminEmail){ adminAvatar.src=emailAvatar(saved.adminEmail,72); adminAvatar.classList.remove('hidden'); adminAvatar.title=`Admin: ${saved.adminEmail}`; } }
+  function refreshUserUI(){ if(currentUser){ userAuthBtn.classList.add('hidden'); userAvatar.src=emailAvatar(currentUser,72); userAvatar.classList.remove('hidden'); userAvatar.title=currentUser; 
+    if(userLogoutBtn){
+      if(currentUser){ userLogoutBtn.classList.remove('hidden'); }
+      else{ userLogoutBtn.classList.add('hidden'); }
+    }
+    } else { userAuthBtn.classList.remove('hidden'); userAvatar.classList.add('hidden'); } }
+
+  function loadProducts(){ products=DEFAULT_PRODUCTS.slice(); updateProductsUI(); try{ const local=JSON.parse(localStorage.getItem(LS_KEYS.PRODUCTS)||'[]'); if(Array.isArray(local)&&local.length){ products=local; updateProductsUI(); } }catch(_){} ((location.protocol==='http:'||location.protocol==='https:')?fetch('products.json?'+Date.now()):Promise.reject()).then(r=>r.ok?r.json():Promise.reject()).then(remote=>{ let remoteArr=[]; if(Array.isArray(remote)) remoteArr=remote; else if(remote && Array.isArray(remote.products)) remoteArr=remote.products; if(remoteArr.length>0){ products=remoteArr; updateProductsUI(); } if(remote && remote.settings){ importSettingsFromRemote(remote.settings); } }).catch(()=>{}); }
+  function updateProductsUI(){ productsCount.textContent=products.length?`${products.length} items`:'No products yet'; filteredProducts=[]; renderProducts(1); renderProductsFull(1); renderTopThree(); initSlider(); }
+  function renderProducts(page){ currentPageHome=page; productsGrid.innerHTML=''; pagination.innerHTML=''; const arr=products; const start=(page-1)*3; const paginated=arr.slice(start,start+3); if(!arr.length){ const msg=document.createElement('div'); msg.className='muted'; msg.style.textAlign='center'; msg.style.padding='12px'; msg.textContent='No products available. Please log in as admin to add products.'; productsGrid.appendChild(msg); return; } paginated.forEach(p=>productsGrid.appendChild(createProductCard(p,false))); const pagesCount=Math.ceil(arr.length/3); if(pagesCount>1){ const prev=pageButton('Prev',()=>page>1&&renderProducts(page-1)); if(page===1) prev.disabled=true; pagination.appendChild(prev);} for(let i=1;i<=pagesCount;i++){ const b=pageButton(i,()=>renderProducts(i)); if(i===page) b.classList.add('active'); pagination.appendChild(b);} if(pagesCount>1){ const next=pageButton('Next',()=>page<pagesCount&&renderProducts(page+1)); if(page===pagesCount) next.disabled=true; pagination.appendChild(next);} }
+  function renderProductsFull(page){ currentPageFull=page; productsGridFull.innerHTML=''; paginationFull.innerHTML=''; const arr=filteredProducts.length?filteredProducts:products; const start=(page-1)*ITEMS_PER_PAGE; const paginated=arr.slice(start,start+ITEMS_PER_PAGE); if(!arr.length){ const msg=document.createElement('div'); msg.className='muted'; msg.style.textAlign='center'; msg.style.padding='12px'; msg.textContent='No products available. Please log in as admin to add products.'; productsGridFull.appendChild(msg); return; } paginated.forEach(p=>productsGridFull.appendChild(createProductCard(p,true))); const pagesCount=Math.ceil(arr.length/ITEMS_PER_PAGE); if(pagesCount>1){ const prev=pageButton('Prev',()=>page>1&&renderProductsFull(page-1)); if(page===1) prev.disabled=true; paginationFull.appendChild(prev);} for(let i=1;i<=pagesCount;i++){ const b=pageButton(i,()=>renderProductsFull(i)); if(i===page) b.classList.add('active'); paginationFull.appendChild(b);} if(pagesCount>1){ const next=pageButton('Next',()=>page<pagesCount&&renderProductsFull(page+1)); if(page===pagesCount) next.disabled=true; paginationFull.appendChild(next);} }
+  function pageButton(label,fn){ const b=document.createElement('button'); b.textContent=label; b.className='page-btn wave'; b.addEventListener('click',fn); return b; }
+  function createProductCard(item,withView){
+    const d=document.createElement('div'); d.className='product-card';
+    const img=document.createElement('img'); img.src=item.image; img.alt=item.name; d.appendChild(img);
+    const meta=document.createElement('div'); meta.className='product-meta'; meta.innerHTML=`<h4>${item.name}</h4><p>${currencySymbol}${item.price}</p>`; d.appendChild(meta);
+    const actions=document.createElement('div'); actions.className='card-actions';
+    const cartBtn=chip('Add to Cart',()=>addToCart(item)); actions.appendChild(cartBtn);
+    const likedByUser=likes.includes(item.id), likeCount=likeCounts[item.id]||0, dislikeCount=dislikeCounts[item.id]||0;
+    const likeBtn=chip((likedByUser?'Dislike':'Like')+` (${likeCount}/${dislikeCount})`,()=>toggleLike(item.id)); actions.appendChild(likeBtn);
+    /*__CARD_SHARE_FEEDBACK__*/
+    const shareBtn=chip('Share',()=>quickShare(), true); actions.appendChild(shareBtn);
+    const fbBtn=chip('Feedback',()=>{ try{ selectFeedbackProduct(item); pages.forEach(p=>p.classList.remove('active')); document.getElementById('feedback').classList.add('active'); }catch(e){ console.warn(e); } }); actions.appendChild(fbBtn);
+    if(withView){ actions.appendChild(chip('View',()=>viewProduct(item))); }
+    if(adminLoggedIn){
+      const eBtn=chip('Edit',()=>editProduct(item.id));  eBtn.classList.add('warn','wave'); actions.appendChild(eBtn);
+      const dBtn=chip('Delete',()=>deleteProduct(item.id)); dBtn.classList.add('danger','wave'); actions.appendChild(dBtn);
+    }
+    d.appendChild(actions); return d;
+  }
+  function chip(text,fn){ const b=document.createElement('button'); b.className='pill wave'; b.textContent=text; b.addEventListener('click',fn); return b; }
+  function handleProductSearch(){ const q=productSearchInput.value.trim().toLowerCase(); filteredProducts=q?products.filter(p=>p.name.toLowerCase().includes(q)):[]; renderProductsFull(1); }
+
+  function loadCart(){ cart=JSON.parse(localStorage.getItem(LS_KEYS.CART)||'[]'); renderCart(); } function saveCart(){ localStorage.setItem(LS_KEYS.CART, JSON.stringify(cart)); }
+  function addToCart(item){ const existing=cart.find(i=>i.id===item.id); if(existing) existing.qty+=1; else cart.push({...item,qty:1}); saveCart(); renderCart(); alert('Product added to cart'); }
+  function removeFromCart(id){ cart=cart.filter(i=>i.id!==id); saveCart(); renderCart(); }
+  function renderCart(){
+    cartItems.innerHTML='';
+    if(!cart.length){ cartItems.innerHTML='<p class="muted">Cart is empty</p>'; return; }
+    cart.forEach(item=>{
+      const w=document.createElement('div'); w.className='cart-item';
+      w.innerHTML=`<div style="display:flex;gap:10px;align-items:center"><img src="${item.image}" alt="${item.name}"><div><strong>${item.name}</strong><br><span>${currencySymbol}${item.price} x ${item.qty}</span></div></div><button class="pill wave">Remove</button>`;
+      const btn=w.querySelector('button'); btn.addEventListener('click',()=>removeFromCart(item.id)); btn.classList.add('danger','wave'); btn.style.background=''; btn.style.color='';
+      cartItems.appendChild(w);
+    });
+  }
+  function loadLikes(){ likes=JSON.parse(localStorage.getItem(LS_KEYS.LIKES)||'[]'); } function saveLikes(){ localStorage.setItem(LS_KEYS.LIKES, JSON.stringify(likes)); }
+  function loadLikeCounts(){ likeCounts=JSON.parse(localStorage.getItem(LS_KEYS.LIKE_COUNTS)||'{}'); dislikeCounts=JSON.parse(localStorage.getItem(LS_KEYS.DISLIKE_COUNTS)||'{}'); }
+  function saveLikeCounts(){ localStorage.setItem(LS_KEYS.LIKE_COUNTS, JSON.stringify(likeCounts)); localStorage.setItem(LS_KEYS.DISLIKE_COUNTS, JSON.stringify(dislikeCounts)); }
+  function toggleLike(id){ const idx=likes.indexOf(id); if(idx===-1){ likes.push(id); likeCounts[id]=(likeCounts[id]||0)+1; } else { likes.splice(idx,1); dislikeCounts[id]=(dislikeCounts[id]||0)+1; } saveLikes(); saveLikeCounts(); renderProducts(currentPageHome); renderProductsFull(currentPageFull); }
+
+  function viewProduct(item){
+    productViewCard.innerHTML='';
+    const img=document.createElement('img'); img.src=item.image; img.alt=item.name; img.style.width='100%'; img.style.height='220px'; img.style.objectFit='contain'; productViewCard.appendChild(img);
+    const h3=document.createElement('h3'); h3.textContent=item.name; productViewCard.appendChild(h3);
+    const p=document.createElement('p'); p.textContent=item.desc; productViewCard.appendChild(p);
+    const price=document.createElement('strong'); price.textContent=currencySymbol+item.price; productViewCard.appendChild(price);
+    const addBtn=document.createElement('button'); addBtn.className='btn primary wave'; addBtn.textContent='Add to Cart'; addBtn.style.marginTop='12px'; addBtn.addEventListener('click',()=>addToCart(item)); productViewCard.appendChild(addBtn);
+    pages.forEach(p=>p.classList.remove('active')); document.getElementById('product-view').classList.add('active');
+  }
+
+  let selectedProduct=null; let allFeedback=[]; let __DEVICE_ID=null;
+function getDeviceId(){ try{ const s=getSavedSite(); if(s.__deviceId){ __DEVICE_ID=s.__deviceId; return __DEVICE_ID; } const id='d'+Date.now().toString(36)+Math.random().toString(36).slice(2,8); const ns=Object.assign({}, s, {__deviceId:id}); localStorage.setItem(LS_KEYS.SITE, JSON.stringify(ns)); try{Storage.set(LS_KEYS.SITE, JSON.stringify(ns));}catch(_){ } __DEVICE_ID=id; return id; }catch(_){ return '__local__'; } }
+  function setupFeedbackSystem(){
+  /* FB_EDIT_SUPPORT_START */
+  window.EDIT_FB_ID = null;
+  function startEditFeedback(id){
+    try{
+      const fb = (allFeedback||[]).find(f=>f.id===id);
+      if(!fb){ alert('Not found'); return; }
+      const isOwner = !!(currentUser && fb.user && String(fb.user).toLowerCase()===String(currentUser).toLowerCase());
+      if(!(adminLoggedIn || isOwner)){ alert('Only author or admin can edit'); return; }
+      // try to re-select product
+      selectedProduct = (products||[]).find(p=>p.id===fb.productId) || null;
+      /* FB_EDIT_SUPPORT_FALLBACK */
+      if(selectedProduct){
+        feedbackSelectedImg.src = selectedProduct.image||'';
+        feedbackSelectedName.textContent = selectedProduct.name||'';
+        feedbackSelectedPrice.textContent = (currencySymbol||'') + (selectedProduct.price||'');
+        selectedFeedbackProduct.style.display='block';
+      } else {
+        feedbackSelectedImg.src = fb.image||'';
+        feedbackSelectedName.textContent = fb.name||'';
+        feedbackSelectedPrice.textContent = '';
+        selectedFeedbackProduct.style.display='block';
+      }
+      feedbackText.value = fb.text||'';
+      EDIT_FB_ID = id;
+      if(submitFeedbackBtn) submitFeedbackBtn.textContent = 'Update';
+      // scroll to feedback page
+      try{
+        document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+        document.getElementById('feedback').classList.add('active');
+        document.getElementById('feedback').scrollIntoView({behavior:'smooth'});
+      }catch(_){}
+    }catch(e){ console.error(e); alert('Edit failed'); }
+  }
+  /* FB_EDIT_SUPPORT_END */
+  window.startEditFeedback = startEditFeedback;
+
+    loadFeedbacks();
+    feedbackSearch.addEventListener('input', handleFeedbackSearch);
+    submitFeedbackBtn.addEventListener('click', submitFeedback);
+    viewFeedbacksBtn.addEventListener('click', openAllFeedbacksModal);
+    document.getElementById('siteGoodBtn').addEventListener('click',()=>updateSiteFeedback('good'));
+    document.getElementById('siteBadBtn').addEventListener('click',()=>updateSiteFeedback('bad'));
+  }
+  function handleFeedbackSearch(){ const q=feedbackSearch.value.trim().toLowerCase(); feedbackSearchResults.innerHTML=''; if(!q) return; products.filter(p=>p.name.toLowerCase().includes(q)).forEach(item=>{ const b=chip(item.name,()=>selectFeedbackProduct(item)); feedbackSearchResults.appendChild(b); }); }
+  function selectFeedbackProduct(item){ selectedProduct=item; feedbackSelectedImg.src=item.image; feedbackSelectedName.textContent=item.name; feedbackSelectedPrice.textContent=currencySymbol+item.price; selectedFeedbackProduct.style.display='block'; feedbackSearchResults.innerHTML=''; feedbackSearch.value=''; }
+  function loadFeedbacks(){ allFeedback=JSON.parse(localStorage.getItem(LS_KEYS.FEEDBACKS)||'[]'); const siteFb=JSON.parse(localStorage.getItem(LS_KEYS.SITE_FEEDBACK)||'{"good":0,"bad":0}'); goodCount.textContent=siteFb.good; badCount.textContent=siteFb.bad; renderFeedbackList(); }
+  function saveFeedbacks(){ localStorage.setItem(LS_KEYS.FEEDBACKS, JSON.stringify(allFeedback)); }
+
+  function submitFeedback(){
+    const text = feedbackText.value.trim();
+    if(!selectedProduct || !text){ alert('Please select a product and write feedback'); return; }
+    if(window.EDIT_FB_ID){
+      const idx = (allFeedback||[]).findIndex(f=>f.id===window.EDIT_FB_ID);
+      if(idx>-1){
+        const fbOld = allFeedback[idx];
+        const isOwner = !!(currentUser && fbOld.user && String(fbOld.user).toLowerCase()===String(currentUser).toLowerCase());
+        if(!(adminLoggedIn || isOwner)){ alert('Only author or admin can update'); return; }
+        allFeedback[idx] = { ...fbOld, productId: selectedProduct.id, name: selectedProduct.name, image: selectedProduct.image, text, time: new Date().toLocaleString() };
+        saveFeedbacks(); window.EDIT_FB_ID=null; if(submitFeedbackBtn) submitFeedbackBtn.textContent='Submit Feedback';
+        feedbackText.value=''; selectedFeedbackProduct.style.display='none'; selectedProduct=null; renderFeedbackList(); toast('Feedback updated ✓'); return;
+      }
+    }
+    const fb = { id: Date.now(), productId: selectedProduct.id, name: selectedProduct.name, image: selectedProduct.image, text, user: currentUser || 'Guest', did: getDeviceId(), time: new Date().toLocaleString() };
+    allFeedback.push(fb); saveFeedbacks(); feedbackText.value=''; selectedFeedbackProduct.style.display='none'; selectedProduct=null; renderFeedbackList(); toast('Feedback submitted ✓');
+  }
+
+  function renderFeedbackList(){
+    feedbackList.innerHTML='';
+    if(!allFeedback.length){ feedbackList.innerHTML='<p class="muted">No feedback yet</p>'; return; }
+    allFeedback.slice().reverse().forEach(fb=>{
+      const d=document.createElement('div'); d.className='fb-item';
+      const canDel = (adminLoggedIn || (currentUser && (fb.user||'').toLowerCase()===String(currentUser).toLowerCase()) || (fb.did && fb.did===getDeviceId()));
+      d.innerHTML=`
+        <div style="display:flex; gap:10px; align-items:flex-start">
+          <img src="${fb.image||''}" alt="${fb.name}" style="width:72px;height:72px;object-fit:contain;border-radius:8px;box-shadow:var(--shadow)">
+          <div style="flex:1">
+            <strong>${fb.name}</strong>
+            <p style="margin:6px 0">${fb.text}</p>
+            <small class="muted">${fb.user||'Guest'} • ${fb.time}</small>
+          </div>
+          ${canDel?'<div style="display:flex;gap:6px;flex-wrap:wrap"><button class="pill wave warn" data-edit>Edit</button><button class="pill wave danger" data-del>Delete</button></div>':''}
+        </div>`;
+      if(canDel){ const btn=d.querySelector('[data-del]'); if(btn) btn.addEventListener('click',()=>deleteFeedback(fb.id)); const eb=d.querySelector('[data-edit]'); if(eb) eb.addEventListener('click',()=>startEditFeedback(fb.id)); }
+      feedbackList.appendChild(d);
+    });
+  }
+
+  function openAllFeedbacksModal(){
+    allFeedbacks.innerHTML='';
+    if(!allFeedback.length){ allFeedbacks.innerHTML='<p class="muted">No feedback yet</p>'; }
+    else {
+      allFeedback.slice().reverse().forEach(fb=>{
+        const d=document.createElement('div'); d.className='fb-item';
+        const canDel = (adminLoggedIn || (currentUser && (fb.user||'').toLowerCase()===String(currentUser).toLowerCase()) || (fb.did && fb.did===getDeviceId()));
+        d.innerHTML=`
+          <div style="display:flex; gap:10px; align-items:flex-start">
+            <img src="${fb.image||''}" alt="${fb.name}" style="width:72px;height:72px;object-fit:contain;border-radius:8px;box-shadow:var(--shadow)">
+            <div style="flex:1">
+              <strong>${fb.name}</strong>
+              <p style="margin:6px 0">${fb.text}</p>
+              <small class="muted">${fb.user||'Guest'} • ${fb.time}</small>
+            </div>
+            ${canDel?'<div style="display:flex;gap:6px;flex-wrap:wrap"><button class="pill wave warn" data-edit>Edit</button><button class="pill wave danger" data-del>Delete</button></div>':''}
+          </div>`;
+        if(canDel){ const btn=d.querySelector('[data-del]'); if(btn) btn.addEventListener('click',()=>{ deleteFeedback(fb.id); openAllFeedbacksModal(); }); const eb=d.querySelector('[data-edit]'); if(eb) eb.addEventListener('click',()=>{ startEditFeedback(fb.id); document.getElementById('viewFeedbackModal').classList.remove('show'); }); }
+        allFeedbacks.appendChild(d);
+      });
+    }
+    viewFeedbacksModal.classList.add('show');
+  }
+
+  function updateSiteFeedback(type){
+    const siteFb=JSON.parse(localStorage.getItem(LS_KEYS.SITE_FEEDBACK)||'{"good":0,"bad":0}');
+    if(type==='good') siteFb.good+=1; else siteFb.bad+=1;
+    localStorage.setItem(LS_KEYS.SITE_FEEDBACK, JSON.stringify(siteFb));
+    goodCount.textContent=siteFb.good; badCount.textContent=siteFb.bad;
+  }
+
+  let sliderTimer=null;
+  function renderTopThree(){ topThree.innerHTML=''; if(!products.length) return; products.slice(0,3).forEach(item=>{ const card=document.createElement('div'); card.className='small-card'; const img=document.createElement('img'); img.src=item.image; img.alt=item.name; card.appendChild(img); card.addEventListener('click',()=>viewProduct(item)); topThree.appendChild(card); }); }
+  function initSlider(){
+    slides.innerHTML=''; slideDots.innerHTML=''; if(sliderTimer){ clearInterval(sliderTimer); sliderTimer=null;}
+    const list=products||[]; if(!list.length) return; const max=Math.min(list.length,6); let current=0;
+    for(let i=0;i<max;i++){ const item=list[i]; const sdiv=document.createElement('div'); sdiv.className='slide';
+      const img=document.createElement('img'); img.src=item.image; img.alt=item.name; sdiv.appendChild(img); sdiv.addEventListener('click',()=>viewProduct(item)); slides.appendChild(sdiv);
+      const dot=document.createElement('div'); dot.className='dot'+(i===0?' active':''); dot.addEventListener('click',()=>{current=i; update(); reset();}); slideDots.appendChild(dot);
+    }
+    function update(){ slides.style.transform=`translateX(-${current*100}% )`; const ds=slideDots.children; for(let j=0;j<ds.length;j++){ ds[j].classList.toggle('active', j===current);} }
+    function reset(){ if(sliderTimer) clearInterval(sliderTimer); sliderTimer=setInterval(()=>{ current=(current+1)%max; update(); },3000); }
+    update(); reset();
+  }
+
+  
+  function quickShare(){
+    try{
+      const saved = getSavedSite();
+      const url = (saved.publicSiteUrl || saved.publicLink || window.location.href);
+      const data = { title: document.title || 'Daud Store', text: 'Check this out', url };
+      if(navigator.share){
+        navigator.share(data).catch(()=>{ /* ignore cancel */ });
+      } else {
+        // Fallback: open the Share modal (admin-independent)
+        document.getElementById('shareModal').classList.add('show');
+      }
+    }catch(e){
+      try{ document.getElementById('shareModal').classList.add('show'); }catch(_){}
+    }
+  }
+
+  function initAdminPanel(){
+    adminOpenBtn.addEventListener('click',()=>{
+      const saved = getSavedSite();
+      if(adminLoggedIn || (currentUser && saved.adminEmail && currentUser.toLowerCase()===saved.adminEmail.toLowerCase())){
+        adminPanel.classList.add('active');
+        /* REFILL_PUBLIC_SITE_URL */
+        try{ const s=getSavedSite(); if(s.publicSiteUrl && typeof publicSiteUrlInput!=='undefined' && publicSiteUrlInput){ publicSiteUrlInput.value=s.publicSiteUrl; } }catch(_){}
+        renderUsersList();
+        updateProductsUI(); /* ensure Edit/Delete buttons appear */
+        toast('Admin access granted.');
+      } else {
+        adminGateModal.classList.add('show');
+      }
+    });
+
+    document.querySelectorAll('[data-close]').forEach(btn =>
+      btn.addEventListener('click', e => e.target.closest('.modal').classList.remove('show'))
+    );
+    if(closeAdmin) closeAdmin.addEventListener('click',()=>adminPanel.classList.remove('active'));
+
+    gateLoginBtn.addEventListener('click',()=>{
+      const saved = getSavedSite();
+      const e = (gateEmail.value||'').trim().toLowerCase();
+      const p = (gatePass.value||'').trim();
+      if(e===(saved.adminEmail||'').toLowerCase() && p===(saved.adminPass||'')){
+        currentUser=e; adminLoggedIn=true;
+        Storage.set(LS_KEYS.CURRENT_USER,currentUser);
+        Storage.set(LS_KEYS.ADMIN_LOGGED_IN,'true');
+        Storage.set(LS_KEYS.REMEMBER_ADMIN,'1');
+        urlRememberSet(currentUser, true);
+        adminGateModal.classList.remove('show');
+        refreshUserUI(); refreshAdminUI(); updateProductsUI(); /* critical */
+        adminPanel.classList.add('active');
+        toast('Welcome, Admin!');
+      } else { alert('Invalid admin credentials'); }
+    });
+
+    if(logoSetBtn) logoSetBtn.addEventListener('click',uploadLogo);
+    if(addProductBtn) addProductBtn.addEventListener('click',uploadProduct);
+    if(clearProductsBtn) clearProductsBtn.addEventListener('click',clearAllProducts);
+    if(saveSentencesBtn) saveSentencesBtn.addEventListener('click',saveSentences);
+    if(setCurrencyBtn) setCurrencyBtn.addEventListener('click',saveCurrency);
+    if(saveContactsBtn) saveContactsBtn.addEventListener('click',saveContacts);
+    if(openContactsBtn) openContactsBtn.addEventListener('click',openContacts);
+    if(openShare) openShare.addEventListener('click',()=>shareModal.classList.add('show'));
+    if(savePublicLinkBtn) savePublicLinkBtn.addEventListener('click',savePublicLink);
+    if(saveWebsiteUrlBtn) saveWebsiteUrlBtn.addEventListener('click',saveWebsiteUrl);
+    if(copyWebsiteUrlBtn) copyWebsiteUrlBtn.addEventListener('click',()=>{ const s=getSavedSite(); const url=s.publicSiteUrl||window.location.origin; copyToClipboard(url);});
+
+    const ex = document.getElementById('exportJsonBtn');
+    if(ex && typeof exportProductsJson==='function') ex.addEventListener('click', exportProductsJson);
+    if(typeof importJsonBtn !== 'undefined' && importJsonBtn) importJsonBtn.addEventListener('click', ()=> uploadJsonInput && uploadJsonInput.click());
+    if(typeof uploadJsonInput !== 'undefined' && uploadJsonInput) uploadJsonInput.addEventListener('change', handleImportProductsJson);
+
+    const cWa=document.getElementById('contactWhatsapp');
+    const cMs=document.getElementById('contactMessenger');
+    const sWa=document.getElementById('shareWhatsapp');
+    const sMs=document.getElementById('shareMessenger');
+    const cp=document.getElementById('copyLinkBtn');
+    if(cWa) cWa.addEventListener('click',()=>{ const saved=JSON.parse(localStorage.getItem(LS_KEYS.SITE)||'{}'); const n=String(saved.whatsapp||'').replace(/[^0-9]/g,''); const url=n?('https://wa.me/'+n):''; if(url) window.open(url,'_blank'); else alert('No WhatsApp number set');});
+    if(cMs) cMs.addEventListener('click',()=>{ if(messengerLink) window.open(messengerLink,'_blank');});
+    if(sWa) sWa.addEventListener('click',()=>{ const s=getSavedSite(); const url=(s.publicSiteUrl||publicLink||window.location.href); window.open('https://wa.me/?text='+encodeURIComponent(url),'_blank');});
+    if(sMs) sMs.addEventListener('click',()=>{ const s=getSavedSite(); const url=(s.publicSiteUrl||publicLink||window.location.href); window.open('https://m.me/?link='+encodeURIComponent(url),'_blank');});
+    if(cp)  cp.addEventListener('click',()=>{ const s=getSavedSite(); const url=(s.publicSiteUrl||publicLink||window.location.href); copyToClipboard(url);});
+  }
+  function signupUser(){
+    const email=(userEmail.value||'').trim().toLowerCase();
+    const pass=(userPass.value||'').trim();
+    if(!email||!pass){ alert('Enter email & password'); return; }
+    const remember = document.getElementById('rememberMeToggle') ? document.getElementById('rememberMeToggle').checked : true;
+    currentUser=email;
+    if(remember){
+      Storage.set(LS_KEYS.CURRENT_USER,currentUser);
+      Storage.set(LS_KEYS.REMEMBER_USER,'1');
+      urlRememberSet(currentUser,false);
+    }else{
+      Storage.set(LS_KEYS.REMEMBER_USER,'0');
+      Storage.remove(LS_KEYS.CURRENT_USER);
+      urlRememberClear();
+    }
+    alert('Account created and logged in');
+    refreshUserUI();
+    try{
+      if(currentUser){
+        if(!Array.isArray(users)) users=[];
+        const low=String(currentUser).toLowerCase();
+        if(!users.includes(low)) users.push(low);
+        saveUsers(); renderUsersList();
+      }
+    }catch(_){}
+    userModal.classList.remove('show');
+  }
+
+  function loginUser(){
+    const email=(userEmail.value||'').trim().toLowerCase();
+    const pass=(userPass.value||'').trim();
+    if(!email||!pass){ alert('Enter email & password'); return; }
+    const remember = document.getElementById('rememberMeToggle') ? document.getElementById('rememberMeToggle').checked : true;
+    currentUser=email;
+    if(remember){
+      Storage.set(LS_KEYS.CURRENT_USER,currentUser);
+      Storage.set(LS_KEYS.REMEMBER_USER,'1');
+      urlRememberSet(currentUser,false);
+    }else{
+      Storage.set(LS_KEYS.REMEMBER_USER,'0');
+      Storage.remove(LS_KEYS.CURRENT_USER);
+      urlRememberClear();
+    }
+    alert('Logged in');
+    refreshUserUI();
+    try{
+      if(currentUser){
+        if(!Array.isArray(users)) users=[];
+        const low=String(currentUser).toLowerCase();
+        if(!users.includes(low)) users.push(low);
+        saveUsers(); renderUsersList();
+      }
+    }catch(_){}
+    userModal.classList.remove('show');
+  }
+
+  function logoutUser(){
+    try{
+      Storage.remove(LS_KEYS.CURRENT_USER);
+      Storage.remove(LS_KEYS.ADMIN_LOGGED_IN);
+      Storage.set(LS_KEYS.REMEMBER_USER,'0');
+      Storage.set(LS_KEYS.REMEMBER_ADMIN,'0');
+      urlRememberClear();
+      currentUser=null; adminLoggedIn=false;
+      alert('Logged out');
+      refreshUserUI(); refreshAdminUI();
+      if(typeof adminPanel!=='undefined') adminPanel.classList.remove('active');
+    }catch(e){ alert('Logout error'); }
+  }
+
+  function refreshAdminUI(){
+    try{
+      document.querySelectorAll('.admin-only').forEach(el=>{ el.style.display = adminLoggedIn ? '' : 'none'; });
+      if(adminLoggedIn){ renderUsersList(); updateProductsUI(); } /* ensure buttons visible */
+    }catch(e){}
+  }
+
+  function initUserSystem(){
+    loadUsers();
+    try{
+      const remember = Storage.get(LS_KEYS.CURRENT_USER, null);
+      const u = urlRememberGet();
+      if(remember){ currentUser = remember; }
+      else if(u && u.u){ currentUser = u.u; }
+      const saved = getSavedSite();
+      if(Storage.get(LS_KEYS.ADMIN_LOGGED_IN)==='true' || (currentUser && saved.adminEmail && currentUser.toLowerCase()===String(saved.adminEmail).toLowerCase())){
+        adminLoggedIn = true;
+      }
+    }catch(e){}
+    refreshUserUI(); refreshAdminUI();
+  }
+
+  function checkAdminPersistentLogin(){
+    try{
+      const hashObj = urlRememberGet();
+      if(hashObj && hashObj.a && hashObj.u && currentUser && hashObj.u.toLowerCase()===currentUser.toLowerCase()){
+        adminLoggedIn = true;
+        Storage.set(LS_KEYS.ADMIN_LOGGED_IN,'true');
+      }
+    }catch(e){}
+    refreshAdminUI();
+  }
+
+  /* Users registry (for admin visibility) */
+  function loadUsers(){ try{ users = JSON.parse(localStorage.getItem(LS_KEYS.USERS)||'[]'); if(!Array.isArray(users)) users=[]; } catch(_){ users = []; } }
+  function saveUsers(){ try{ const uniq = Array.from(new Set((users||[]).map(e => String(e||'').trim().toLowerCase()).filter(Boolean))); localStorage.setItem(LS_KEYS.USERS, JSON.stringify(uniq)); users = uniq; }catch(_){} }
+  function renderUsersList(){
+    const box = document.getElementById('usersList'); if(!box) return;
+    const list = Array.isArray(users) ? users.slice().sort() : []; const gmails = list.filter(u=>/@gmail\.com$/i.test(u));
+    if(!list.length){ box.innerHTML = '<p class="muted">No users yet</p>'; return; }
+    box.innerHTML = '<div><strong>Total: '+list.length+'</strong></div>'
+      + '<ul style="margin:8px 0 0 18px">' + list.map(u=>'<li>'+u+'</li>').join('') + '</ul>'
+      + '<div class="muted" style="margin-top:8px">Gmail ('+gmails.length+'): '+(gmails.join(', ')||'—')+'</div>';
+  }
+
+  /* Products */
+  function saveProducts(){ try{ localStorage.setItem(LS_KEYS.PRODUCTS, JSON.stringify(products)); }catch(_){ } updateProductsUI(); }
+  function readFileToDataURL(file){ return new Promise((resolve,reject)=>{ if(!file){ resolve(''); return; } const reader=new FileReader(); reader.onload=e=>resolve(e.target.result); reader.onerror=reject; reader.readAsDataURL(file); }); }
+  async function uploadProduct(){
+    try{
+      const name=(productName && productName.value||'').trim();
+      const price=(productPrice && productPrice.value||'').trim();
+      const desc=(productDesc && productDesc.value||'').trim();
+      const file= productImageInput && productImageInput.files && productImageInput.files[0];
+      if(!name || !price){ alert('Name & price required'); return; }
+      const image = await readFileToDataURL(file);
+      const id = Date.now();
+      const item={ id, name, price, desc, image: image || (DEFAULT_PRODUCTS[0] && DEFAULT_PRODUCTS[0].image) || '' };
+      products.push(item); saveProducts();
+      if(productImageInput) productImageInput.value=''; if(productName) productName.value=''; if(productPrice) productPrice.value=''; if(productDesc) productDesc.value='';
+      toast('Product added ✓');
+    }catch(e){ alert('Upload failed'); }
+  }
+  function editProduct(id){
+    if(!adminLoggedIn){ alert('Admin only'); return; }
+    const idx = products.findIndex(p=>p.id===id); if(idx===-1){ alert('Not found'); return; }
+    const p = products[idx];
+    const nn = prompt('Edit name:', p.name); if(nn===null) return;
+    const np = prompt('Edit price:', p.price); if(np===null) return;
+    const nd = prompt('Edit description:', p.desc||''); if(nd===null) return;
+    products[idx] = {...p, name: (nn||p.name).trim(), price: (np||p.price).trim(), desc: nd};
+    saveProducts(); toast('Product updated ✓');
+  }
+  function deleteProduct(id){
+    if(!adminLoggedIn){ alert('Admin only'); return; }
+    if(!confirm('Delete this product?')) return;
+    products = products.filter(p=>p.id!==id);
+    saveProducts(); toast('Product deleted ✓');
+  }
+
+  /* Misc admin actions */
+  function uploadLogo(){} /* stub */ 
+  function clearAllProducts(){ localStorage.removeItem(LS_KEYS.PRODUCTS); products=DEFAULT_PRODUCTS.slice(); updateProductsUI(); toast('Products cleared'); }
+  function saveSentences(){ const v=(sentencesInput&&sentencesInput.value||'').trim(); const saved=JSON.parse(localStorage.getItem(LS_KEYS.SITE)||'{}'); saved.sentences=v; localStorage.setItem(LS_KEYS.SITE, JSON.stringify(saved)); rotatingSentences=v? v.split(',').map(s=>s.trim()).filter(Boolean):rotatingSentences; toast('Saved sentences'); }
+  function saveCurrency(){ const v=(currencyInput&&currencyInput.value||'').trim(); if(!v){ alert('Enter symbol'); return;} const saved=JSON.parse(localStorage.getItem(LS_KEYS.SITE)||'{}'); saved.currency=v; localStorage.setItem(LS_KEYS.SITE, JSON.stringify(saved)); currencySymbol=v; updateProductsUI(); toast('Currency set'); }
+  function saveContacts(){ const cc=(whatsappCountry&&whatsappCountry.value)||''; const nn=(whatsappNumber&&whatsappNumber.value)||''; const ms=(messengerInput&&messengerInput.value)||''; const saved=JSON.parse(localStorage.getItem(LS_KEYS.SITE)||'{}'); const digits=String(cc+nn).replace(/[^0-9]/g,''); saved.whatsapp = digits; saved.messenger=ms; localStorage.setItem(LS_KEYS.SITE, JSON.stringify(saved)); whatsappLink = digits ? ('https://wa.me/'+digits) : ''; messengerLink=saved.messenger||''; toast('Contacts saved'); }
+  function openContacts(){ const saved=JSON.parse(localStorage.getItem(LS_KEYS.SITE)||'{}'); const n=String(saved.whatsapp||'').replace(/[^0-9]/g,''); const wa=n?('https://wa.me/'+n):''; const ms=saved.messenger||''; if(wa) window.open(wa,'_blank'); else if(ms) window.open(ms,'_blank'); else alert('No contact set'); }
+  function saveWebsiteUrl(){
+  const v=(publicSiteUrlInput&&publicSiteUrlInput.value||'').trim();
+  if(!v){ alert('Enter your website URL'); return; }
+  const saved=JSON.parse(localStorage.getItem(LS_KEYS.SITE)||'{}');
+  saved.publicSiteUrl=v;
+  localStorage.setItem(LS_KEYS.SITE, JSON.stringify(saved));
+  try{ Storage.set(LS_KEYS.SITE, JSON.stringify(saved)); }catch(_){} /* cookie fallback */
+  toast('Website URL saved');
+}
+
+  function savePublicLink(){ const v=(publicLinkInput&&publicLinkInput.value||'').trim(); const saved=JSON.parse(localStorage.getItem(LS_KEYS.SITE)||'{}'); saved.publicLink=v; localStorage.setItem(LS_KEYS.SITE, JSON.stringify(saved)); publicLink=v; toast('Public link saved'); }
+  function exportProductsJson(){
+    try{
+      const saved = getSavedSite();
+      const payload = { settings: saved, products: products };
+      const jsonStr = JSON.stringify(payload,null,2);
+      const blob = new Blob([jsonStr], {type:'application/json'});
+      const url = (window.URL||window.webkitURL).createObjectURL(blob);
+      const a=document.createElement('a'); a.href=url; a.download='products.json'; document.body.appendChild(a); a.click();
+      setTimeout(()=>{ (window.URL||window.webkitURL).revokeObjectURL(url); a.remove(); }, 0);
+      toast('Download started');
+    }catch(e){ alert('Export failed'); }
+  }
+  function handleImportProductsJson(evt){
+    const f = evt && evt.target && evt.target.files && evt.target.files[0];
+    if(!f){ alert('No file'); return; }
+    const reader = new FileReader();
+    reader.onload = (e)=>{
+      try{
+        const obj = JSON.parse(e.target.result);
+        const arr = Array.isArray(obj)? obj : (obj && obj.products) || [];
+        if(arr.length){ products = arr; localStorage.setItem(LS_KEYS.PRODUCTS, JSON.stringify(products)); updateProductsUI(); toast('Imported products'); }
+        if(obj && obj.settings) importSettingsFromRemote(obj.settings);
+      }catch(err){ alert('Invalid JSON'); }
+    };
+    reader.readAsText(f);
+  }
+  function copyToClipboard(t){ try{ navigator.clipboard && navigator.clipboard.writeText ? navigator.clipboard.writeText(t) : document.execCommand('copy'); toast('Copied ✓'); }catch(_){ prompt('Copy', t); } }
+
+  /* Feedback delete (author or admin) */
+  function deleteFeedback(id){
+    const fbItem = allFeedback.find(f=>f.id===id);
+    const isOwner = !!(fbItem && currentUser && fbItem.user && String(fbItem.user).toLowerCase()===String(currentUser).toLowerCase());
+    if(!(adminLoggedIn || isOwner)){ alert('Only author or admin can delete'); return; }
+    if(!confirm('Delete this feedback?')) return;
+    allFeedback = allFeedback.filter(f=>f.id!==id);
+    saveFeedbacks(); renderFeedbackList(); toast('Feedback deleted');
+  }
+
+  function autoRotateText(){ let idx=0; setInterval(()=>{ rotatingText.textContent=rotatingSentences[idx]; idx=(idx+1)%rotatingSentences.length; },2800); }
+  function toast(msg){ const el=document.getElementById('adminAlert'); if(!el) return; el.textContent=msg; el.classList.remove('hidden'); clearTimeout(toast._t); toast._t=setTimeout(()=>el.classList.add('hidden'),2200); }
+
+  document.querySelectorAll('.modal').forEach(m => {
+    m.addEventListener('click', (e) => { const card = m.querySelector('.modal-card'); if(!card.contains(e.target)) m.classList.remove('show'); });
+  });
+  document.addEventListener('keydown', (e)=>{ if(e.key==='Escape'){ document.querySelectorAll('.modal.show').forEach(m=>m.classList.remove('show')); } });
+
+  (function(){
+    var src=''; if(urlRememberGet()) src+='URL-hash '; if(Storage.get(LS_KEYS.CURRENT_USER)) src+='Storage ';
+    if(src){ var el=document.getElementById('adminAlert'); if(el){ el.textContent='Login restored via: '+src.trim(); el.classList.remove('hidden'); setTimeout(()=>el.classList.add('hidden'), 1800);} }
+  })();
+  </script>
+
+<!-- Persist Sync Endpoint / App Key / Remote URL across visits -->
+<script>
+(function(){
+  const LS_SITE = (window.LS_KEYS && LS_KEYS.SITE) || 'site';
+  function getSite(){ try{return JSON.parse(localStorage.getItem(LS_SITE)||'{}')}catch(e){return {}} }
+  function setSite(x){ try{ localStorage.setItem(LS_SITE, JSON.stringify(x)); }catch(e){} }
+
+  function initPersist(){
+    const s = getSite();
+    const ep  = document.getElementById('syncEndpointInput');
+    const key = document.getElementById('syncAppKeyInput');
+    const raw = document.getElementById('remoteUrl') || document.getElementById('publicLinkInput');
+
+    // restore saved values
+    if (s && s.syncEndpoint && ep) ep.value = s.syncEndpoint;
+    if (s && s.syncAppKey   && key) key.value = s.syncAppKey;
+    const savedRaw = (s && s.publicLink) || localStorage.getItem('remoteProductsUrl');
+    if (savedRaw && raw) raw.value = savedRaw;
+
+    function persist(){
+      const ss = getSite();
+      if (ep)  ss.syncEndpoint = (ep.value||'').trim();
+      if (key) ss.syncAppKey   = (key.value||'').trim();
+      const rv = raw ? (raw.value||'').trim() : '';
+      if (rv){
+        ss.publicLink = rv; // mirror so older code also reads it
+        try{ localStorage.setItem('remoteProductsUrl', rv); }catch(e){}
+      }
+      setSite(ss);
+    }
+
+    ['blur','change'].forEach(evt=>{
+      if (ep)  ep.addEventListener(evt, persist);
+      if (key) key.addEventListener(evt, persist);
+      if (raw) raw.addEventListener(evt, persist);
+    });
+
+    const saveSync = document.getElementById('saveSyncEndpointBtn');
+    if (saveSync) saveSync.addEventListener('click', persist);
+
+    const savePublic = document.getElementById('savePublicLinkBtn');
+    if (savePublic) savePublic.addEventListener('click', persist);
+  }
+
+  if (document.readyState !== 'loading') { initPersist(); } else { document.addEventListener('DOMContentLoaded', initPersist); }
+})();
+</script>
+
+
+<script>
+(function(){
+  const LS_SITE = (window.LS_KEYS && LS_KEYS.SITE) || 'site';
+
+  function getSite(){ try{return JSON.parse(localStorage.getItem(LS_SITE)||'{}')}catch(e){return {}} }
+  function setSite(obj){ try{ localStorage.setItem(LS_SITE, JSON.stringify(obj||{})); }catch(e){} }
+  function toastMsg(t){ try{ const el=document.getElementById('adminAlert'); if(!el) return; el.textContent=t; el.classList.remove('hidden'); clearTimeout(toastMsg._t); toastMsg._t=setTimeout(()=>el.classList.add('hidden'),2200);}catch(e){} }
+
+  // Build payload from current site settings + products
+  function buildProductsPayload(){
+    let settings = {}; 
+    try{ settings = JSON.parse(localStorage.getItem(LS_SITE)||'{}'); }catch(_){ settings = {}; }
+    let products = [];
+    try{ products = JSON.parse(localStorage.getItem((window.LS_KEYS&&LS_KEYS.PRODUCTS)||'daudProducts')||'[]'); }catch(_){ products = []; }
+    return { settings, products };
+  }
+
+  // Save remote RAW URL
+  function saveRemoteURL(){
+    const input = document.getElementById('remoteUrl');
+    const url = (input && input.value || '').trim();
+    if(!url){ alert('Remote URL is empty'); return; }
+    const s = getSite();
+    s.publicLink = url; // keep for backward-compat with existing code
+    try{ localStorage.setItem('remoteProductsUrl', url); }catch(_){}
+    setSite(s);
+    toastMsg('Remote URL saved');
+  }
+
+  // Pull JSON from remote and apply
+  async function pullFromRemote(){
+    const input = document.getElementById('remoteUrl');
+    const stored = localStorage.getItem('remoteProductsUrl') || '';
+    const s = getSite();
+    const url = (input && input.value || s.publicLink || stored || '').trim();
+    if(!url){ alert('Set Remote products.json URL first'); return; }
+    try{
+      const res = await fetch(url, { cache: 'no-store' });
+      if(!res.ok){ throw new Error('HTTP '+res.status); }
+      const data = await res.json();
+      let products = [], settings = null;
+      if(Array.isArray(data)){ products = data; }
+      else if(data && (Array.isArray(data.products) || typeof data.settings === 'object')){
+        products = Array.isArray(data.products) ? data.products : [];
+        settings = data.settings || null;
+      } else {
+        throw new Error('Unsupported JSON shape');
+      }
+      if(products){ localStorage.setItem((window.LS_KEYS&&LS_KEYS.PRODUCTS)||'daudProducts', JSON.stringify(products)); }
+      if(settings){ 
+        const saved = getSite(); Object.assign(saved, settings); setSite(saved);
+      }
+      if(typeof window.updateProductsUI==='function') window.updateProductsUI();
+      if(typeof window.importSettingsFromRemote==='function' && settings){ window.importSettingsFromRemote(settings); }
+      toastMsg('Pulled '+(products?products.length:0)+' products from remote ✓');
+    }catch(e){
+      alert('Pull failed: '+ e.message);
+      console.error(e);
+    }
+  }
+
+  // Save endpoint/app key
+  function saveSyncEndpoint(){
+    const epEl = document.getElementById('syncEndpointInput');
+    const keyEl = document.getElementById('syncAppKeyInput');
+    const s = getSite();
+    s.syncEndpoint = (epEl && epEl.value || '').trim();
+    s.syncAppKey   = (keyEl && keyEl.value || '').trim();
+    setSite(s);
+    toastMsg('Endpoint saved');
+  }
+
+  // POST payload to endpoint
+  async function testPush(){
+    const s = getSite();
+    let endpoint = (document.getElementById('syncEndpointInput') && document.getElementById('syncEndpointInput').value || s.syncEndpoint || '').trim();
+    const appKey = (document.getElementById('syncAppKeyInput') && document.getElementById('syncAppKeyInput').value || s.syncAppKey || '').trim();
+    if(!endpoint){ alert('Set Sync Endpoint first'); return; }
+    const payload = buildProductsPayload();
+    try{
+      const headers = { 'Content-Type': 'application/json' };
+      if(appKey){ headers['X-App-Key'] = appKey; }
+      const res = await fetch(endpoint, { method:'POST', headers, body: JSON.stringify(payload) });
+      const text = await res.text();
+      if(res.ok){ toastMsg('Test Push OK'); }
+      else{ alert('Failed: '+res.status+' '+text); }
+    }catch(e){
+      alert('Push error: '+e.message);
+    }
+  }
+
+  function initRemoteSyncUI(){
+    // Wire buttons
+    const saveRemote = document.getElementById('saveRemoteUrlBtn');
+    const pullNow = document.getElementById('pullNowBtn');
+    const saveEp = document.getElementById('saveSyncEndpointBtn');
+    const testBtn = document.getElementById('testPushBtn');
+    if(saveRemote) saveRemote.addEventListener('click', saveRemoteURL);
+    if(pullNow) pullNow.addEventListener('click', pullFromRemote);
+    if(saveEp) saveEp.addEventListener('click', saveSyncEndpoint);
+    if(testBtn) testBtn.addEventListener('click', testPush);
+
+    // Restore inputs from storage
+    const s = getSite();
+    const raw = document.getElementById('remoteUrl');
+    if(raw && (s.publicLink || localStorage.getItem('remoteProductsUrl'))) raw.value = s.publicLink || localStorage.getItem('remoteProductsUrl') || '';
+    const ep  = document.getElementById('syncEndpointInput');
+    const key = document.getElementById('syncAppKeyInput');
+    if(ep && s.syncEndpoint) ep.value = s.syncEndpoint;
+    if(key && s.syncAppKey) key.value = s.syncAppKey;
+  }
+  if (document.readyState !== 'loading') { initRemoteSyncUI(); }
+  else { document.addEventListener('DOMContentLoaded', initRemoteSyncUI); }
+})();
+</script>
+
+
+<div id="footbar" aria-label="Quick nav">
+  <div class="fb-wrap">
+    <button class="pill primary wave" data-go="home">Home</button>
+    <button class="pill wave" data-go="products">Products</button>
+    <button class="pill wave" data-go="feedback">Feedback</button>
+    <button class="pill wave" data-go="contact">Contact</button>
+    <button class="pill wave" data-go="cart">Cart</button>
+  </div>
+</div>
+<script>
+  function gotoPage(id){ try{ document.querySelectorAll('.page').forEach(p=>p.classList.remove('active')); document.getElementById(id).classList.add('active'); window.scrollTo({top:0,behavior:'smooth'});
+  /* footbar active toggle */
+  const btns=document.querySelectorAll('#footbar .pill'); btns.forEach(b=>b.classList.remove('active')); const cur=[...btns].find(b=>b.getAttribute('data-go')===id); if(cur) cur.classList.add('active');
+}catch(e){} }
+  (function(){ try{ document.querySelectorAll('#footbar [data-go]').forEach(b=> b.addEventListener('click', e=> gotoPage(e.currentTarget.getAttribute('data-go')) ));
+try{ const first=document.querySelector('#footbar [data-go="home"]'); if(first) first.classList.add('active'); }catch(e){} }catch(e){} })();
+</script>
+</body>
+</html>
