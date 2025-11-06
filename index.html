@@ -1,0 +1,3611 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>দাউদ স্টোর — Daud Store</title>
+  <meta name="description" content="দাউদ স্টোর - single-file responsive e-commerce (admin upload, feedback with product image, pagination).">
+  <style>
+    :root{ --bg:#f8fafc; --card:#fff; --muted:#6b7280; --accent:#ff7a00; --accent-2:#ff9a33; --shadow:0 10px 30px rgba(2,6,23,0.06); --radius:12px; --btn-shadow: rgba(255,122,0,.45);}
+    *{box-sizing:border-box} html,body{height:100%} body{margin:0;font-family:Inter,system-ui,Arial;color:#0f172a;background:var(--bg);-webkit-font-smoothing:antialiased}
+    .topbar{position:sticky;top:0;z-index:120;display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;box-shadow:0 6px 20px rgba(0,0,0,0.08)}
+    .brand-left{display:flex;align-items:center;gap:12px}
+    #siteLogo{width:52px;height:52px;border-radius:10px;background:#fff;padding:6px;object-fit:contain;box-shadow:var(--shadow)}
+    .brand-title{font-weight:800;font-size:1.05rem}.brand-sub{font-size:12px;opacity:.95}
+    .nav{display:flex;gap:12px;align-items:center}.nav a{font-weight:700;color:rgba(255,255,255,0.95);padding:8px 10px;border-radius:8px}.nav a:hover{background:rgba(255,255,255,0.06)}
+    .top-actions{display:flex;gap:8px;align-items:center}
+
+    /* Base buttons (will be overridden by 3D styles below) */
+    .btn{padding:8px 12px;border-radius:10px;border:none;cursor:pointer;font-weight:700;background:#fff;color:var(--accent)}
+    .btn.ghost{background:transparent;color:#fff;border:1px solid rgba(255,255,255,0.12)} .btn.small{padding:6px 8px;font-size:.9rem}
+    .btn.primary{background:var(--accent);color:#fff}
+    .pill{padding:6px 10px;border-radius:999px;border:none;background:#fff;color:var(--accent);font-weight:700}
+    .pagination{display:flex;gap:8px;justify-content:center;margin-top:12px}.page-btn{padding:8px 12px;border-radius:10px;border:1px solid #eee;background:var(--card);cursor:pointer}
+
+    /* Layout */
+    main{padding:16px;max-width:1200px;margin:0 auto}
+    .hero{display:flex;flex-direction:column;gap:12px}
+    .hero-top{display:flex;align-items:center;gap:12px;justify-content:space-between}
+    .logo-box{display:flex;align-items:center;gap:12px}
+    .hero-center{flex:1;text-align:center}
+    .rotating-text{font-size:1.1rem;font-weight:800;color:var(--accent);min-height:48px;display:flex;align-items:center;justify-content:center}
+    .top-three{display:flex;gap:10px;justify-content:center;flex-wrap:nowrap;overflow:hidden}
+    .small-card{flex:0 0 28%;min-width:90px;height:110px;background:var(--card);border-radius:12px;display:flex;align-items:center;justify-content:center;padding:8px;box-shadow:var(--shadow);cursor:pointer}
+    .small-card img{max-width:100%;max-height:100%;object-fit:contain}
+    .slider{width:100%;height:220px;background:var(--card);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center}
+    .slides{display:flex;height:100%;transition:transform .6s ease}
+    .slide{min-width:100%;height:100%;display:flex;align-items:center;justify-content:center;padding:12px}
+    .slide img{max-height:180px;max-width:90%;object-fit:contain;border-radius:10px}
+    .dots{display:flex;gap:8px;justify-content:center;margin-top:8px}.dot{width:10px;height:10px;border-radius:50%;background:rgba(0,0,0,0.12);cursor:pointer}.dot.active{background:var(--accent)}
+    .section{margin-top:18px} .section h2{margin:0 0 6px 0}
+    .products-grid{display:grid;gap:14px;grid-template-columns:repeat(3,1fr)}
+    .product-card{background:var(--card);border-radius:12px;padding:12px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:8px;align-items:center}
+    .product-card img{width:100%;height:160px;object-fit:contain;border-radius:8px}
+    .product-meta{width:100%;text-align:center}.product-meta h4{margin:6px 0 4px 0;font-size:1rem}.product-meta p{margin:0;color:var(--muted);font-size:.95rem}
+    .card-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:8px}
+    .center-card{background:var(--card);padding:16px;border-radius:12px;box-shadow:var(--shadow);margin:16px 0}
+    .cart-item{display:flex;gap:12px;align-items:center;justify-content:space-between;border-radius:10px;padding:10px;background:#fff}
+    .cart-item img{height:72px;width:72px;object-fit:contain;border-radius:8px}
+    .feedback-list{display:flex;flex-direction:column;gap:10px;margin-top:12px}.fb-item{background:#fff;padding:10px;border-radius:10px;box-shadow:var(--shadow)}
+    .admin-panel{position:fixed;right:-520px;top:80px;width:520px;background:var(--card);border-radius:12px;padding:14px;box-shadow:0 30px 60px rgba(2,6,23,0.12);transition:right .35s;z-index:220;max-height:82vh;overflow:auto}
+    .admin-panel.active{right:16px}.admin-row{display:flex;flex-direction:column;gap:8px;margin-top:10px}.admin-row input,.admin-row textarea,.admin-row select{padding:10px;border-radius:8px;border:1px solid #eee}
+    .modal{display:none;position:fixed;inset:0;background:rgba(2,6,23,0.45);align-items:center;justify-content:center;z-index:300;padding:18px}.modal.show{display:flex}
+    .modal-card{background:var(--card);padding:16px;border-radius:12px;box-shadow:var(--shadow);max-width:720px;width:100%;position:relative}.modal-close{position:absolute;right:8px;top:8px;border:none;background:transparent;font-size:18px;cursor:pointer}
+    .muted{color:var(--muted)} .hidden{display:none} .page{display:none}.page.active{display:block}
+    .avatar{ width:36px;height:36px;border-radius:50%; object-fit:cover;background:#fff;box-shadow:var(--shadow); border:2px solid rgba(255,255,255,.8); }
+
+    /* 3D + Animated Buttons (overrides) */
+    .btn, .pill, .page-btn{
+      position:relative;
+      padding:10px 14px;
+      border-radius:12px;
+      border:none;
+      font-weight:800;
+      letter-spacing:.2px;
+      background: linear-gradient(180deg,#ffffff,#f1f5f9);
+      color:#0f172a;
+      box-shadow:
+        0 12px 26px rgba(2,6,23,.10),
+        0 8px 12px rgba(2,6,23,.06),
+        inset 0 1px 0 rgba(255,255,255,.9),
+        inset 0 -4px 8px rgba(2,6,23,.08);
+      transform: translateZ(0);
+      transition: transform .18s cubic-bezier(.2,.9,.25,1), box-shadow .18s, filter .3s;
+      cursor:pointer;
+      user-select:none;
+    }
+    .btn::after, .pill::after, .page-btn::after{
+      content:""; position:absolute; inset:0; border-radius:inherit;
+      background: radial-gradient(ellipse at 50% 0%, rgba(255,255,255,.45), rgba(255,255,255,0) 60%);
+      pointer-events:none; mix-blend-mode: screen;
+    }
+    .btn.wave::before, .pill.wave::before, .page-btn.wave::before{
+      content:""; position:absolute; inset:-2px; border-radius:inherit;
+      background: conic-gradient(from 0deg at 50% 50%, rgba(255,255,255,.2), rgba(255,255,255,0) 25%, rgba(255,255,255,.2) 50%, rgba(255,255,255,0) 75%, rgba(255,255,255,.2) 100%);
+      filter: blur(10px); opacity:0; transition:opacity .35s ease;
+    }
+    .btn.wave:hover::before, .pill.wave:hover::before, .page-btn.wave:hover::before{ opacity:1; }
+    .btn:hover, .pill:hover, .page-btn:hover{
+      transform: translateY(-4px) scale(1.02);
+      box-shadow: 0 22px 40px rgba(2,6,23,.18), inset 0 -6px 10px rgba(2,6,23,.12);
+    }
+    .btn:active, .pill:active, .page-btn:active{
+      transform: translateY(0) scale(.98);
+      box-shadow: 0 12px 24px rgba(2,6,23,.14), inset 0 -2px 6px rgba(2,6,23,.25);
+    }
+    .btn.primary, .pill.primary, .page-btn.active{
+      background: linear-gradient(180deg, var(--accent-2), var(--accent));
+      color:#fff;
+      box-shadow:
+        0 14px 30px var(--btn-shadow),
+        0 10px 14px rgba(2,6,23,.12),
+        inset 0 1px 0 rgba(255,255,255,.28),
+        inset 0 -6px 12px rgba(2,6,23,.22);
+    }
+    .pill.warn{ /* Edit */
+      background: linear-gradient(180deg,#fbbf24,#f59e0b);
+      color:#fff;
+      box-shadow: 0 12px 24px rgba(245,158,11,.35), inset 0 -6px 12px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.25);
+    }
+    .pill.danger,
+    .pill[data-del]{
+      background: linear-gradient(180deg,#ef4444,#dc2626) !important;
+      color:#fff !important;
+      box-shadow: 0 12px 24px rgba(239,68,68,.35), inset 0 -6px 12px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.25) !important;
+    }
+
+    @media (max-width:1000px){.products-grid{grid-template-columns:repeat(2,1fr)}.small-card{flex:0 0 32%}}
+    @media (max-width:640px){.nav{display:none}.top-three{gap:8px;overflow:auto;padding:6px}.small-card{flex:0 0 30%}.slider{height:180px}.product-card img{width:100%;height:auto;max-height:140px}.products-grid{grid-template-columns:repeat(1,1fr)}.hero-top{flex-direction:column;align-items:center;gap:8px}main{padding:12px}.admin-panel{width:94%}.topbar{flex-wrap:wrap;gap:8px}.top-actions{flex-wrap:wrap;width:100%;justify-content:center}.top-actions .btn{flex:1 1 calc(50% - 12px);margin-top:6px}}
+  
+/* NAV 3D ENHANCED */
+.nav .nav-link{
+  position:relative;
+  display:inline-block;
+  padding:8px 12px;
+  border-radius:12px;
+  font-weight:800;
+  letter-spacing:.2px;
+  background: linear-gradient(180deg,#ffffff,#f1f5f9);
+  color:#0f172a !important;
+  box-shadow:
+    0 12px 26px rgba(2,6,23,.10),
+    0 8px 12px rgba(2,6,23,.06),
+    inset 0 1px 0 rgba(255,255,255,.9),
+    inset 0 -4px 8px rgba(2,6,23,.08);
+  transition: transform .18s cubic-bezier(.2,.9,.25,1), box-shadow .18s;
+}
+.nav .nav-link:after{
+  content:""; position:absolute; inset:0; border-radius:inherit;
+  background: radial-gradient(ellipse at 50% 0%, rgba(255,255,255,.45), rgba(255,255,255,0) 60%);
+  pointer-events:none; mix-blend-mode: screen;
+}
+.nav .nav-link:hover{ transform:translateY(-3px); box-shadow:0 22px 40px rgba(2,6,23,.18), inset 0 -6px 10px rgba(2,6,23,.12); }
+.nav .nav-link:active{ transform:translateY(0); box-shadow:0 12px 24px rgba(2,6,23,.14), inset 0 -2px 6px rgba(2,6,23,.25); }
+@media (max-width:640px){
+  .nav{ display:flex !important; flex-wrap:wrap; gap:8px }
+  .nav .nav-link{ flex:1 1 calc(50% - 8px); text-align:center }
+}
+
+/* Sticky 3D footer nav */
+#footbar{
+  position:fixed; left:0; right:0; bottom:10px; z-index:250;
+  display:flex; gap:8px; justify-content:center; flex-wrap:wrap;
+  padding:8px 12px; pointer-events:none;
+}
+#footbar .fb-wrap{ background:rgba(255,255,255,0.85); backdrop-filter:saturate(150%) blur(8px);
+  border-radius:14px; padding:8px; box-shadow: 0 10px 30px rgba(15,23,42,.18); pointer-events:auto; display:flex; gap:8px; }
+#footbar .pill{ min-width:86px; text-align:center }
+@media (max-width:640px){ #footbar .pill{ flex:1 1 calc(50% - 8px) } }
+
+/* FOOTBAR ACTIVE HIGHLIGHT */
+#footbar .pill.active{ 
+  background: linear-gradient(180deg, var(--accent-2), var(--accent)) !important; 
+  color:#fff !important; 
+  box-shadow: 0 14px 30px var(--btn-shadow), 0 10px 14px rgba(2,6,23,.12), inset 0 1px 0 rgba(255,255,255,.28), inset 0 -6px 12px rgba(2,6,23,.22);
+}
+#footbar .pill:hover{ filter:hue-rotate(22deg) saturate(1.2); }
+</style>
+
+<script>
+  const VOTES_KEY='daudVotes';
+  let votes = {};
+  function loadVotes(){ try{ votes = JSON.parse(localStorage.getItem(VOTES_KEY)||'{}')||{}; if(Array.isArray(votes) || typeof votes!=='object') votes={}; }catch(_){ votes={}; } }
+  function saveVotes(){ try{ localStorage.setItem(VOTES_KEY, JSON.stringify(votes)); }catch(_){} }
+  function setVote(id, kind){
+    const prev = votes[id] || null;
+    if(prev === kind){ if(kind==='like'){ if(window.likeCounts){ likeCounts[id]=Math.max(0,(likeCounts[id]||0)-1); } } if(kind==='dislike'){ if(window.dislikeCounts){ dislikeCounts[id]=Math.max(0,(dislikeCounts[id]||0)-1); } } delete votes[id]; saveVotes(); if(window.saveLikeCounts) saveLikeCounts(); return; }
+    if(prev==='like' && window.likeCounts){ likeCounts[id]=Math.max(0,(likeCounts[id]||0)-1); }
+    if(prev==='dislike' && window.dislikeCounts){ dislikeCounts[id]=Math.max(0,(dislikeCounts[id]||0)-1); }
+    if(kind==='like'){ if(window.likeCounts){ likeCounts[id]=(likeCounts[id]||0)+1; } votes[id]='like'; }
+    else if(kind==='dislike'){ if(window.dislikeCounts){ dislikeCounts[id]=(dislikeCounts[id]||0)+1; } votes[id]='dislike'; }
+    else { delete votes[id]; }
+    saveVotes(); if(window.saveLikeCounts) saveLikeCounts();
+  }
+  document.addEventListener('DOMContentLoaded',function(){ try{ loadVotes(); }catch(_){} });
+</script>
+
+<!-- R7-UI-COLOR-PATCH -->
+<style id="r7-ui-colors">
+  .pill.like{ background: linear-gradient(180deg,#22c55e,#16a34a); color:#fff;
+    box-shadow: 0 12px 24px rgba(34,197,94,.35), inset 0 -6px 12px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.25); }
+  .pill.dislike{ background: linear-gradient(180deg,#ef4444,#dc2626); color:#fff;
+    box-shadow: 0 12px 24px rgba(239,68,68,.35), inset 0 -6px 12px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.25); }
+  .pill.share{ background: linear-gradient(180deg,#60a5fa,#3b82f6); color:#fff;
+    box-shadow: 0 12px 24px rgba(59,130,246,.35), inset 0 -6px 12px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.25); }
+  .pill.feedback{ background: linear-gradient(180deg,#a78bfa,#8b5cf6); color:#fff;
+    box-shadow: 0 12px 24px rgba(139,92,246,.35), inset 0 -6px 12px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.25); }
+  .pill.view{ background: linear-gradient(180deg,#34d399,#10b981); color:#fff;
+    box-shadow: 0 12px 24px rgba(16,185,129,.35), inset 0 -6px 12px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.25); }
+  .pill.cart{ background: linear-gradient(180deg,#fbbf24,#f59e0b); color:#fff;
+    box-shadow: 0 12px 24px rgba(245,158,11,.35), inset 0 -6px 12px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.25); }
+</style>
+
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand-left">
+      <img id="siteLogo" src="" alt="দাউদ স্টোর Logo">
+      <div><div class="brand-title">দাউদ স্টোর</div><div class="brand-sub">Quality • Trust • Fast</div></div>
+    </div>
+    <nav class="nav" aria-label="Main">
+      <a href="#home" class="nav-link">Home</a>
+      <a href="#products" class="nav-link">Products</a>
+      <a href="#cart" class="nav-link">Cart</a>
+      <a href="#contact" class="nav-link">Contact</a>
+      <a href="#feedback" class="nav-link">Feedback</a>
+    </nav>
+    <div class="top-actions">
+      <img id="adminAvatar" class="avatar" alt="Admin" title="Site Admin" />
+      <img id="userAvatar" class="avatar hidden" alt="You" title="You" />
+      <button id="userAuthBtn" class="btn small wave" onclick="document.getElementById('userModal').classList.add('show')">Sign Up / Login</button>
+      <button id="userLogoutBtn" class="btn small hidden wave">Logout</button>
+      <button id="quickShareBtn" class="btn small wave">Share</button>
+      <button id="adminOpenBtn" class="btn primary small wave">Admin</button>
+    </div>
+  </header>
+
+  <div id="adminAlert" class="hidden" style="background:var(--accent);color:#fff;padding:8px 12px;border-radius:8px;position:fixed;top:80px;right:16px;z-index:500;box-shadow:0 4px 12px rgba(0,0,0,0.1);"></div>
+
+  <main>
+    <section id="home" class="page active">
+      <div class="hero">
+        <div class="hero-top">
+          <div class="logo-box"><img id="heroLogo" src="" alt="logo" style="width:64px;height:64px;border-radius:10px;object-fit:contain"></div>
+          <div class="hero-center"><div id="rotatingText" class="rotating-text">স্বাগতম — দাউদ স্টোর</div></div>
+          <div style="width:64px"></div>
+        </div>
+        <div class="top-three" id="topThree"></div>
+        <div class="slider" id="sliderWrap"><div class="slides" id="slides"></div></div>
+        <div class="dots" id="slideDots"></div>
+      </div>
+      <section class="section">
+        <div style="display:flex;justify-content:space-between;align-items:center"><h2>Trending Products</h2><div id="productsCount" class="muted"></div></div>
+        <div id="productsGrid" class="products-grid"></div>
+        <div id="pagination" class="pagination"></div>
+      </section>
+    </section>
+
+    <section id="product-view" class="page"><div class="center-card" id="productViewCard"></div></section>
+
+    <section id="products" class="page">
+      <div class="center-card">
+        <h2>All Products</h2>
+        <input id="productSearchInput" placeholder="পণ্য সার্চ করুন..." style="width:100%;padding:10px;border-radius:8px;border:1px solid #eee;margin-top:6px;margin-bottom:8px" />
+        <div id="productsGridFull" class="products-grid"></div>
+        <div id="paginationFull" class="pagination"></div>
+      </div>
+    </section>
+
+    <section id="cart" class="page">
+      <div class="center-card">
+        <h2>Your Cart</h2>
+        <div id="cartItems" class="card-list"></div>
+        <div style="text-align:center;margin-top:12px"><button id="checkoutBtn" class="btn primary wave">Checkout (Demo)</button></div>
+      </div>
+    </section>
+
+    <section id="contact" class="page">
+      <div class="center-card">
+        <h2>Contact</h2>
+        <p class="muted">Contact via WhatsApp or Messenger (set by admin).</p>
+        <div style="display:flex;gap:10px;justify-content:center;margin-top:12px">
+          <button id="contactWhatsapp" class="btn wave" style="background:#25D366;color:#fff">WhatsApp</button>
+          <button id="contactMessenger" class="btn wave" style="background:#0084FF;color:#fff">Messenger</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="feedback" class="page">
+      <div class="center-card">
+        <h2>Feedback</h2>
+        <div style="margin-top:10px">
+          <h3>Website feedback</h3>
+          <div style="display:flex;gap:8px;justify-content:center;margin-top:8px">
+            <button id="siteGoodBtn" class="btn wave">👍 Good (<span id="goodCount">0</span>)</button>
+            <button id="siteBadBtn" class="btn wave">👎 Bad (<span id="badCount">0</span>)</button>
+          </div>
+        </div>
+        <div style="margin-top:14px">
+          <h3>Product feedback</h3>
+          <label>Search product</label>
+          <input id="feedbackSearch" placeholder="Type product name..." style="width:100%;padding:10px;border-radius:8px;border:1px solid #eee;margin-top:6px" />
+          <div id="feedbackSearchResults" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"></div>
+          <div id="selectedFeedbackProduct" style="display:none;margin-top:12px">
+            <div style="display:flex;gap:10px;align-items:center">
+              <img id="feedbackSelectedImg" src="" alt="" style="height:92px;border-radius:8px;box-shadow:var(--shadow)">
+              <div><strong id="feedbackSelectedName"></strong><br><span id="feedbackSelectedPrice" class="muted"></span></div>
+            </div>
+            <textarea id="feedbackText" placeholder="Write your feedback..." rows="4" style="width:100%;margin-top:10px;padding:10px;border:1px solid #eee;border-radius:8px"></textarea>
+            <div style="display:flex;gap:8px;justify-content:center;margin-top:8px">
+              <button id="submitFeedbackBtn" class="btn primary wave">Submit Feedback</button>
+              <button id="viewFeedbacksBtn" class="btn wave">View All</button>
+            </div>
+          </div>
+          <div id="feedbackList" class="feedback-list" style="margin-top:12px"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <aside id="adminPanel" class="admin-panel" aria-hidden="true">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <h3>Admin Panel</h3>
+      <div><button id="closeAdmin" class="btn small wave">✕</button></div>
+    </div>
+
+    <div class="admin-row admin-only" style="display:none">
+      <label><strong>Upload Logo</strong></label>
+      <input id="logoInput" type="file" accept="image/*" />
+      <button id="logoSetBtn" class="btn wave">Upload Logo</button>
+    </div>
+
+    <div class="admin-row admin-only" style="display:none;margin-top:10px">
+      <label><strong>Upload Product</strong></label>
+      <input id="productImageInput" type="file" accept="image/*" />
+      <input id="productName" type="text" placeholder="Product name" />
+      <input id="productPrice" type="text" placeholder="Price" />
+      <input id="productDesc" type="text" placeholder="Short description" />
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button id="addProductBtn" class="btn primary wave">Add Product</button>
+        <button id="clearProductsBtn" class="btn wave">Clear All</button>
+      </div>
+    </div>
+
+    <div class="admin-row admin-only" style="display:none;margin-top:10px">
+      <label><strong>Animated sentences (comma separated)</strong></label>
+      <textarea id="sentencesInput" placeholder="Welcome!, Best deals!, Fast delivery" rows="3"></textarea>
+      <button id="saveSentencesBtn" class="btn primary wave">Save Sentences</button>
+    </div>
+
+    <div class="admin-row admin-only" style="display:none;margin-top:10px">
+      <label><strong>Currency Symbol (shown on product cards)</strong></label>
+      <input id="currencyInput" type="text" placeholder="৳ or $" />
+      <button id="setCurrencyBtn" class="btn wave">Set Currency</button>
+    </div>
+
+    <div class="admin-row admin-only" style="display:none;margin-top:10px">
+      <label><strong>WhatsApp (country + number)</strong></label>
+      <div style="display:flex;gap:8px">
+        <select id="whatsappCountry">
+          <option value="+880" selected>+880 (BD)</option><option value="+91">+91 (IN)</option>
+          <option value="+1">+1 (US)</option><option value="+44">+44 (UK)</option><option value="+971">+971 (UAE)</option>
+        </select>
+        <input id="whatsappNumber" placeholder="1XXXXXXXXX" />
+      </div>
+      <label style="margin-top:8px"><strong>Messenger link</strong></label>
+      <input id="messengerInput" placeholder="https://m.me/username" />
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button id="saveContactsBtn" class="btn primary wave">Save Contacts</button>
+        <button id="openContactsBtn" class="btn wave">Test Contact</button>
+      </div>
+    </div>
+
+    <div class="admin-row admin-only" style="display:none;margin-top:10px">
+      <label><strong>Share (Admin)</strong></label>
+      <button id="openShare" class="btn wave">Open Share Modal</button>
+    </div>
+
+    <div class="admin-row admin-only" style="display:none;margin-top:10px">
+      <label><strong>Public Link (GitHub Pages)</strong></label>
+    <div class="admin-row admin-only" style="display:none;margin-top:10px">
+      <label><strong>Website Public URL</strong></label>
+      <input id="publicSiteUrlInput" type="text" placeholder="https://bolodlol.vercel.app" />
+      <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+        <button id="saveWebsiteUrlBtn" class="btn wave">Save Website URL</button>
+        <button id="copyWebsiteUrlBtn" class="btn wave">Copy</button>
+      </div>
+      <p class="muted" style="margin-top:6px">This is your site share link (e.g., Vercel domain). Do <b>not</b> put RAW JSON here.</p>
+    </div>
+
+      <input id="publicLinkInput" type="text" placeholder="https://username.github.io/your-site" />
+      <button id="savePublicLinkBtn" class="btn wave">Save Public Link</button>
+    </div>
+
+    <!-- Registered Users (sibling section, fixed nesting) -->
+    <div class="admin-row admin-only" style="display:none;margin-top:10px">
+      <label><strong>Registered Users</strong></label>
+      <div id="usersList" class="center-card" style="max-height:220px;overflow:auto"></div>
+    </div>
+
+    <div class="admin-row admin-only" style="display:none;margin-top:10px">
+      <label><strong>Admin Email</strong></label>
+      <input id="changeAdminEmailInput" type="email" placeholder="admin@example.com" />
+      <button id="changeAdminEmailBtn" class="btn wave">Save Admin Email</button>
+    </div>
+
+    <div class="admin-row admin-only" style="display:none;margin-top:10px">
+      <label><strong>Admin Password</strong></label>
+      <input id="changeAdminPassInput" type="password" placeholder="new password" />
+      <button id="changeAdminPassBtn" class="btn wave">Save Admin Password</button>
+    </div>
+
+    <div class="admin-row admin-only" style="display:none;margin-top:10px">
+      <label><strong>Export / Backup</strong></label>
+    <!-- Remote products.json (RAW URL) -->
+    <div class="admin-row admin-only" style="display:none;margin-top:10px">
+      <label><strong>Remote products.json URL (RAW)</strong></label>
+      <input id="remoteUrl" type="text" placeholder="https://raw.githubusercontent.com/123bolod/bolodlol/main/products.json" />
+      <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+        <button id="saveRemoteUrlBtn" class="btn wave">Save URL</button>
+        <button id="pullNowBtn" class="btn wave">Pull Now</button>
+      </div>
+      <p class="muted" style="margin-top:6px">Use a public RAW link (GitHub <code>raw.githubusercontent.com</code>). Supports either an array or <code>{ settings, products }</code>.</p>
+    </div>
+
+    <!-- Serverless Sync (Endpoint + App Key) -->
+    <div class="admin-row admin-only" style="display:none;margin-top:10px">
+      <label><strong>Sync Endpoint (serverless URL)</strong></label>
+      <input id="syncEndpointInput" type="text" placeholder="https://bolodlol.vercel.app/api/update-products" />
+      <label style="margin-top:6px"><strong>App Key (optional)</strong></label>
+      <input id="syncAppKeyInput" type="text" placeholder="APP_KEY for X-App-Key header or ?app_key=" />
+      <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+        <button id="saveSyncEndpointBtn" class="btn wave">Save Endpoint</button>
+        <button id="testPushBtn" class="btn primary wave">Test Push</button>
+      </div>
+    </div>
+
+      <button id="exportJsonBtn" class="btn wave">Download products.json</button>
+      <button id="importJsonBtn" class="btn wave">Import products.json</button>
+      <input id="uploadJsonInput" type="file" accept="application/json" class="hidden" />
+    </div>
+  </aside>
+
+  <div id="adminGateModal" class="modal">
+    <div class="modal-card">
+      <button class="modal-close" data-close onclick="(this.closest('.modal')||this.parentNode).classList.remove('show')">✕</button>
+      <h3>Admin Login</h3>
+      <input id="gateEmail" type="email" placeholder="Admin email" />
+      <input id="gatePass" type="password" placeholder="Admin password" />
+      <div style="display:flex;gap:8px;margin-top:8px"><button id="gateLoginBtn" class="btn primary wave">Login</button></div>
+    </div>
+  </div>
+
+  <div id="shareModal" class="modal">
+    <div class="modal-card">
+      <button class="modal-close" data-close onclick="(this.closest('.modal')||this.parentNode).classList.remove('show')">✕</button>
+      <h3>Share দাউদ স্টোর</h3>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button id="shareWhatsapp" class="btn wave" style="background:#25D366;color:#fff">WhatsApp</button>
+        <button id="shareMessenger" class="btn wave" style="background:#0084FF;color:#fff">Messenger</button>
+        <button id="copyLinkBtn" class="btn wave">Copy Link</button>
+      </div>
+      <p class="muted" style="margin-top:8px">Note: Host on GitHub Pages/Netlify (not file://).</p>
+    </div>
+  </div>
+
+  <div id="userModal" class="modal">
+    <div class="modal-card">
+      <button class="modal-close" data-close onclick="(this.closest('.modal')||this.parentNode).classList.remove('show')">✕</button>
+      <h3>Sign Up / Login</h3>
+      <input id="userEmail" type="email" placeholder="Email" />
+      <input id="userPass" type="password" placeholder="Password" />
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <div class="row" id="rememberUserRow" style="margin:8px 0">
+          <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="rememberMeToggle" /><span>Remember me</span></label>
+        </div>
+        <button id="userSignupBtn" class="btn primary wave" onclick="signupUser()">Sign Up</button>
+        <button id="userLoginBtn" class="btn wave" onclick="loginUser()">Login</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="viewFeedbackModal" class="modal">
+    <div class="modal-card">
+      <button class="modal-close" data-close onclick="(this.closest('.modal')||this.parentNode).classList.remove('show')">✕</button>
+      <h3>All Feedbacks</h3>
+      <div id="allFeedbacks"></div>
+    </div>
+  </div>
+
+  <script>
+      const pages=document.querySelectorAll('.page'); const navLinks=document.querySelectorAll('.nav-link');
+  const siteLogo=document.getElementById('siteLogo'); const heroLogo=document.getElementById('heroLogo'); const rotatingText=document.getElementById('rotatingText');
+  const topThree=document.getElementById('topThree'); const slides=document.getElementById('slides'); const slideDots=document.getElementById('slideDots');
+  const productsGrid=document.getElementById('productsGrid'); const productsGridFull=document.getElementById('productsGridFull'); const pagination=document.getElementById('pagination'); const paginationFull=document.getElementById('paginationFull'); const productsCount=document.getElementById('productsCount');
+  const productViewCard=document.getElementById('productViewCard'); const cartItems=document.getElementById('cartItems');
+  const feedbackSearch=document.getElementById('feedbackSearch'); const feedbackSearchResults=document.getElementById('feedbackSearchResults'); const selectedFeedbackProduct=document.getElementById('selectedFeedbackProduct'); const feedbackSelectedImg=document.getElementById('feedbackSelectedImg'); const feedbackSelectedName=document.getElementById('feedbackSelectedName'); const feedbackSelectedPrice=document.getElementById('feedbackSelectedPrice'); const feedbackText=document.getElementById('feedbackText'); const submitFeedbackBtn=document.getElementById('submitFeedbackBtn'); const viewFeedbacksBtn=document.getElementById('viewFeedbacksBtn'); const allFeedbacks=document.getElementById('allFeedbacks'); const goodCount=document.getElementById('goodCount'); const badCount=document.getElementById('badCount');
+  const publicLinkInput=document.getElementById('publicLinkInput'); const savePublicLinkBtn=document.getElementById('savePublicLinkBtn'); const publicSiteUrlInput=document.getElementById('publicSiteUrlInput'); const saveWebsiteUrlBtn=document.getElementById('saveWebsiteUrlBtn'); const copyWebsiteUrlBtn=document.getElementById('copyWebsiteUrlBtn');
+  const productSearchInput=document.getElementById('productSearchInput'); let filteredProducts=[]; let adminLoggedIn=false; const feedbackList=document.getElementById('feedbackList');
+  const userAuthBtn=document.getElementById('userAuthBtn'); const userLogoutBtn=document.getElementById('userLogoutBtn');
+  if(userAuthBtn){ userAuthBtn.addEventListener('click', ()=>{ if(!currentUser) document.getElementById('userModal').classList.add('show');}); }
+
+  if(userLogoutBtn) userLogoutBtn.addEventListener('click', logoutUser); const adminOpenBtn=document.getElementById('adminOpenBtn'); const adminAvatar=document.getElementById('adminAvatar'); const userAvatar=document.getElementById('userAvatar');
+  const adminPanel=document.getElementById('adminPanel'); const closeAdmin=document.getElementById('closeAdmin');
+  const logoInput=document.getElementById('logoInput'); const logoSetBtn=document.getElementById('logoSetBtn');
+  const productImageInput=document.getElementById('productImageInput'); const productName=document.getElementById('productName'); const productPrice=document.getElementById('productPrice'); const productDesc=document.getElementById('productDesc'); const addProductBtn=document.getElementById('addProductBtn'); const clearProductsBtn=document.getElementById('clearProductsBtn');
+  const viewFeedbacksModal=document.getElementById('viewFeedbackModal'); const userModal=document.getElementById('userModal'); const shareModal=document.getElementById('shareModal');
+  const sentencesInput=document.getElementById('sentencesInput'); const saveSentencesBtn=document.getElementById('saveSentencesBtn'); const currencyInput=document.getElementById('currencyInput'); const setCurrencyBtn=document.getElementById('setCurrencyBtn'); const whatsappCountry=document.getElementById('whatsappCountry'); const whatsappNumber=document.getElementById('whatsappNumber'); const messengerInput=document.getElementById('messengerInput'); const saveContactsBtn=document.getElementById('saveContactsBtn'); const openContactsBtn=document.getElementById('openContactsBtn'); const openShare=document.getElementById('openShare');
+  const changeAdminEmailInput=document.getElementById('changeAdminEmailInput'); const changeAdminEmailBtn=document.getElementById('changeAdminEmailBtn'); const changeAdminPassInput=document.getElementById('changeAdminPassInput'); const changeAdminPassBtn=document.getElementById('changeAdminPassBtn');
+  const adminGateModal=document.getElementById('adminGateModal'); const gateEmail=document.getElementById('gateEmail'); const gatePass=document.getElementById('gatePass'); const gateLoginBtn=document.getElementById('gateLoginBtn');
+
+  // ---- Persistent storage helpers (localStorage + cookie fallback) ----
+  function setCookie(name, value, days){
+    try{
+      var d=new Date(); d.setTime(d.getTime()+days*24*60*60*1000);
+      document.cookie = name + "=" + encodeURIComponent(value) + ";expires=" + d.toUTCString() + ";path=/";
+    }catch(e){}
+  }
+  function getCookie(name){
+    try{
+      var cname = name + "="; var arr = document.cookie.split(';');
+      for(var i=0;i<arr.length;i++){ var c=arr[i].trim(); if(c.indexOf(cname)===0) return decodeURIComponent(c.substring(cname.length)); }
+    }catch(e){}
+    return null;
+  }
+  const Storage = {
+    get: (k, def=null) => {
+      try{ var v = localStorage.getItem(k); if(v!==null) return v; }catch(e){}
+      var cv = getCookie(k); return cv!==null ? cv : def;
+    },
+    set: (k, v) => {
+      try{ localStorage.setItem(k, v); }catch(e){}
+      setCookie(k, v, 365);
+    },
+    remove: (k) => {
+      try{ localStorage.removeItem(k); }catch(e){}
+      setCookie(k, "", -1);
+    }
+  };
+
+  // ---- URL-hash remember fallback ----
+  function _b64e(str){ try{return btoa(unescape(encodeURIComponent(str)));}catch(e){ return btoa(str);} }
+  function _b64d(str){ try{return decodeURIComponent(escape(atob(str)));}catch(e){ return atob(str);} }
+  function urlRememberSet(email, isAdmin){
+    try{
+      var obj = {u: email, a: !!isAdmin, t: Date.now()};
+      var data = _b64e(JSON.stringify(obj));
+      var h = location.hash.replace(/^#/, '');
+      var parts = h ? h.split('&').filter(s=>!s.startsWith('auth=')) : [];
+      parts.push('auth='+data);
+      location.hash = parts.join('&');
+    }catch(e){}
+  }
+  function urlRememberClear(){
+    try{
+      var h = location.hash.replace(/^#/, '');
+      if(!h){ return; }
+      var parts = h.split('&').filter(s=>!s.startsWith('auth='));
+      location.hash = parts.join('&');
+    }catch(e){}
+  }
+  function urlRememberGet(){
+    try{
+      var h = location.hash.replace(/^#/, '');
+      if(!h) return null;
+      var m = h.split('&').find(s=>s.startsWith('auth='));
+      if(!m) return null;
+      var val = m.split('=')[1]||'';
+      if(!val) return null;
+      var obj = JSON.parse(_b64d(val));
+      if(obj && obj.u){ return obj; }
+    }catch(e){}
+    return null;
+  }
+
+  function getSavedSite(){ try{ return JSON.parse(localStorage.getItem(LS_KEYS.SITE)||Storage.get(LS_KEYS.SITE,'{}')||'{}'); }catch(_){ return {}; } }
+
+const LS_KEYS={ REMEMBER_USER:'remember_user', REMEMBER_ADMIN:'remember_admin',  SITE:'daudSite', PRODUCTS:'daudProducts', CART:'daudCart', FEEDBACKS:'daudFeedbacks', SITE_FEEDBACK:'daudSiteFeedback', ADMIN:'daudAdmin', LIKES:'daudLikes', LIKE_COUNTS:'daudLikeCounts', DISLIKE_COUNTS:'daudDislikeCounts', USERS:'daudUsers', CURRENT_USER:'daudCurrentUser', ADMIN_LOGGED_IN:'daudAdminLoggedIn'};
+
+  const DEFAULT_PRODUCTS=[{id:1,name:'Sample Product',price:'100',desc:'This is a sample product for demonstration.',image:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAIAAAD/gAIDAAAA5klEQVR4nO3QQQkAIADAQLV/Z63gXiLcJRibe3BrvQ74iVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWYFZgVmBWcEBil4Bx/GEGnoAAAAASUVORK5CYII='}];
+  let rotatingSentences=['স্বাগতম — দাউদ স্টোর','Best deals!','Fast delivery']; let currencySymbol='৳'; let whatsappLink=''; let messengerLink=''; let publicLink=''; let users=[]; let currentUser=null; let products=[]; const ITEMS_PER_PAGE=6; let currentPageHome=1; let currentPageFull=1; let cart=[]; let likes=[]; let likeCounts={}; let dislikeCounts={};
+
+  if (document.readyState!=='loading') initApp(); else document.addEventListener('DOMContentLoaded', initApp);
+
+  function initApp(){
+  getDeviceId();
+  try{ const quickShareBtn=document.getElementById('quickShareBtn'); if(quickShareBtn) quickShareBtn.addEventListener('click', quickShare); }catch(e){}
+ setupNavigation(); loadSiteSettings(); loadProducts(); loadCart(); loadLikes(); loadLikeCounts(); setupFeedbackSystem(); autoRotateText(); initAdminPanel(); initUserSystem(); checkAdminPersistentLogin(); if(productSearchInput) productSearchInput.addEventListener('input', handleProductSearch); }
+
+  function setupNavigation(){ function switchPage(target){ pages.forEach(p=>p.classList.remove('active')); document.getElementById(target).classList.add('active'); } navLinks.forEach(link=>{ link.addEventListener('click', e=>{ e.preventDefault(); const href=link.getAttribute('href'); const pageId=href?href.replace('#',''):''; switchPage(pageId||'home'); }); }); switchPage('home'); }
+
+  function loadSiteSettings(){ const saved=getSavedSite(); if(!saved.adminEmail) saved.adminEmail='mdipml000@gmail.com'; if(!saved.adminPass) saved.adminPass='daud@2025'; localStorage.setItem(LS_KEYS.SITE, JSON.stringify(saved)); if(saved.logo){ siteLogo.src=heroLogo.src=saved.logo; } if(saved.sentences){ rotatingSentences=saved.sentences.split(',').map(s=>s.trim()).filter(Boolean);} if(saved.currency){ currencySymbol=saved.currency;} if(saved.whatsapp){ whatsappLink='https://wa.me/'+String(saved.whatsapp).replace(/[^0-9]/g,''); } if(saved.messenger){ messengerLink=saved.messenger;} if(saved.publicLink){ publicLink=saved.publicLink; if(publicLinkInput) publicLinkInput.value=publicLink;} refreshAdminAvatar(); refreshUserUI(); }
+
+  function importSettingsFromRemote(obj){ if(!obj) return; const saved=JSON.parse(localStorage.getItem(LS_KEYS.SITE)||'{}'); ['logo','currency','sentences','whatsapp','messenger','adminEmail','adminPass','publicLink'].forEach(k=>{ if(obj[k]) saved[k]=obj[k]; }); localStorage.setItem(LS_KEYS.SITE, JSON.stringify(saved)); if(saved.logo){ siteLogo.src=heroLogo.src=saved.logo; } if(saved.currency){ currencySymbol=saved.currency;} if(saved.sentences){ rotatingSentences=saved.sentences.split(',').map(s=>s.trim()).filter(Boolean);} if(saved.whatsapp){ whatsappLink='https://wa.me/'+String(saved.whatsapp).replace(/[^0-9]/g,''); } if(saved.messenger){ messengerLink=saved.messenger;} if(saved.publicLink){ publicLink=saved.publicLink; if(publicLinkInput) publicLinkInput.value=publicLink;} refreshAdminAvatar(); }
+
+  function emailAvatar(email,size=64){ const c=document.createElement('canvas'); c.width=c.height=size; const x=c.getContext('2d'); const t=(email||'user@example.com').trim().toLowerCase(); let h=0; for(let i=0;i<t.length;i++){h=((h<<5)-h)+t.charCodeAt(i);h|=0;} const hue=Math.abs(h)%360; x.fillStyle=`hsl(${hue} 70% 55%)`; x.beginPath(); x.arc(size/2,size/2,size/2,0,Math.PI*2); x.fill(); const n=t.split('@')[0]; const ini=n.split(/[._-]+/).slice(0,2).map(s=>s[0]||'').join('').toUpperCase()||'U'; x.fillStyle='#fff'; x.font=`${Math.floor(size*0.45)}px sans-serif`; x.textAlign='center'; x.textBaseline='middle'; x.fillText(ini,size/2,size/2+1); return c.toDataURL('image/png'); }
+  function refreshAdminAvatar(){ const saved=JSON.parse(localStorage.getItem(LS_KEYS.SITE)||'{}'); if(saved.adminEmail){ adminAvatar.src=emailAvatar(saved.adminEmail,72); adminAvatar.classList.remove('hidden'); adminAvatar.title=`Admin: ${saved.adminEmail}`; } }
+  function refreshUserUI(){ if(currentUser){ userAuthBtn.classList.add('hidden'); userAvatar.src=emailAvatar(currentUser,72); userAvatar.classList.remove('hidden'); userAvatar.title=currentUser; 
+    if(userLogoutBtn){
+      if(currentUser){ userLogoutBtn.classList.remove('hidden'); }
+      else{ userLogoutBtn.classList.add('hidden'); }
+    }
+    } else { userAuthBtn.classList.remove('hidden'); userAvatar.classList.add('hidden'); } }
+
+  function loadProducts(){ products=DEFAULT_PRODUCTS.slice(); updateProductsUI(); try{ const local=JSON.parse(localStorage.getItem(LS_KEYS.PRODUCTS)||'[]'); if(Array.isArray(local)&&local.length){ products=local; updateProductsUI(); } }catch(_){} (((location.protocol==='http:'||location.protocol==='https:') && (typeof window.AUTO_FETCH_LOCAL_PRODUCTS==='boolean' ? window.AUTO_FETCH_LOCAL_PRODUCTS : false))?fetch('products.json?'+Date.now()):Promise.reject()).then(r=>r.ok?r.json():Promise.reject()).then(remote=>{ let remoteArr=[]; if(Array.isArray(remote)) remoteArr=remote; else if(remote && Array.isArray(remote.products)) remoteArr=remote.products; if(remoteArr.length>0){ const map=new Map((products||[]).map(p=>[p&&p.id,p])); remoteArr.forEach(p=>map.set(p&&p.id,p)); products=Array.from(map.values()); try{ localStorage.setItem(LS_KEYS.PRODUCTS, JSON.stringify(products)); }catch(_){ } updateProductsUI(); } if(remote && remote.settings){ importSettingsFromRemote(remote.settings); } }).catch(()=>{}); }
+  function updateProductsUI(){ productsCount.textContent=products.length?`${products.length} items`:'No products yet'; filteredProducts=[]; renderProducts(1); renderProductsFull(1); renderTopThree(); initSlider(); }
+  function renderProducts(page){ currentPageHome=page; productsGrid.innerHTML=''; pagination.innerHTML=''; const arr=products; const size=(window.HOME_PAGE_SIZE||9); const start=(page-1)*size; const paginated=arr.slice(start,start+size); if(!arr.length){ const msg=document.createElement('div'); msg.className='muted'; msg.style.textAlign='center'; msg.style.padding='12px'; msg.textContent='No products available. Please log in as admin to add products.'; productsGrid.appendChild(msg); return; } paginated.forEach(p=>productsGrid.appendChild(createProductCard(p,false))); const pagesCount=Math.ceil(arr.length/size); if(pagesCount>1){ const prev=pageButton('Prev',()=>page>1&&renderProducts(page-1)); if(page===1) prev.disabled=true; pagination.appendChild(prev);} for(let i=1;i<=pagesCount;i++){ const b=pageButton(i,()=>renderProducts(i)); if(i===page) b.classList.add('active'); pagination.appendChild(b);} if(pagesCount>1){ const next=pageButton('Next',()=>page<pagesCount&&renderProducts(page+1)); if(page===pagesCount) next.disabled=true; pagination.appendChild(next);} }
+  function renderProductsFull(page){ currentPageFull=page; productsGridFull.innerHTML=''; paginationFull.innerHTML=''; const arr=filteredProducts.length?filteredProducts:products; const start=(page-1)*ITEMS_PER_PAGE; const paginated=arr.slice(start,start+ITEMS_PER_PAGE); if(!arr.length){ const msg=document.createElement('div'); msg.className='muted'; msg.style.textAlign='center'; msg.style.padding='12px'; msg.textContent='No products available. Please log in as admin to add products.'; productsGridFull.appendChild(msg); return; } paginated.forEach(p=>productsGridFull.appendChild(createProductCard(p,true))); const pagesCount=Math.ceil(arr.length/ITEMS_PER_PAGE); if(pagesCount>1){ const prev=pageButton('Prev',()=>page>1&&renderProductsFull(page-1)); if(page===1) prev.disabled=true; paginationFull.appendChild(prev);} for(let i=1;i<=pagesCount;i++){ const b=pageButton(i,()=>renderProductsFull(i)); if(i===page) b.classList.add('active'); paginationFull.appendChild(b);} if(pagesCount>1){ const next=pageButton('Next',()=>page<pagesCount&&renderProductsFull(page+1)); if(page===pagesCount) next.disabled=true; paginationFull.appendChild(next);} }
+  function pageButton(label,fn){ const b=document.createElement('button'); b.textContent=label; b.className='page-btn wave'; b.addEventListener('click',fn); return b; }
+  function createProductCard(item,withView){
+    const d=document.createElement('div'); d.className='product-card';
+    const img=document.createElement('img'); img.src=item.image; img.alt=item.name; d.appendChild(img);
+    const meta=document.createElement('div'); meta.className='product-meta'; meta.innerHTML=`<h4>${item.name}</h4><p>${currencySymbol}${item.price}</p>`; d.appendChild(meta);
+    const actions=document.createElement('div'); actions.className='card-actions';
+    const cartBtn=chip('Add to Cart',()=>addToCart(item)); actions.appendChild(cartBtn);
+    const likedByUser=likes.includes(item.id), likeCount=likeCounts[item.id]||0, dislikeCount=dislikeCounts[item.id]||0;
+    const likeBtn=chip((likedByUser?'Dislike':'Like')+` (${likeCount}/${dislikeCount})`,()=>toggleLike(item.id)); actions.appendChild(likeBtn);
+    /*__CARD_SHARE_FEEDBACK__*/
+    const shareBtn=chip('Share',()=>quickShare(), true); actions.appendChild(shareBtn);
+    const fbBtn=chip('Feedback',()=>{ try{ selectFeedbackProduct(item); pages.forEach(p=>p.classList.remove('active')); document.getElementById('feedback').classList.add('active'); }catch(e){ console.warn(e); } }); actions.appendChild(fbBtn);
+    if(withView){ actions.appendChild(chip('View',()=>viewProduct(item))); }
+    if(adminLoggedIn){
+      const eBtn=chip('Edit',()=>editProduct(item.id));  eBtn.classList.add('warn','wave'); actions.appendChild(eBtn);
+      const dBtn=chip('Delete',()=>deleteProduct(item.id)); dBtn.classList.add('danger','wave'); actions.appendChild(dBtn);
+    }
+    d.appendChild(actions); return d;
+  }
+  function chip(text,fn){ const b=document.createElement('button'); b.className='pill wave'; b.textContent=text; b.addEventListener('click',fn); return b; }
+  function handleProductSearch(){ const q=productSearchInput.value.trim().toLowerCase(); filteredProducts=q?products.filter(p=>p.name.toLowerCase().includes(q)):[]; renderProductsFull(1); }
+
+  function loadCart(){ cart=JSON.parse(localStorage.getItem(LS_KEYS.CART)||'[]'); renderCart(); } function saveCart(){ localStorage.setItem(LS_KEYS.CART, JSON.stringify(cart)); }
+  function addToCart(item){ const existing=cart.find(i=>i.id===item.id); if(existing) existing.qty+=1; else cart.push({...item,qty:1}); saveCart(); renderCart(); alert('Product added to cart'); }
+  function removeFromCart(id){ cart=cart.filter(i=>i.id!==id); saveCart(); renderCart(); }
+  function renderCart(){
+    cartItems.innerHTML='';
+    if(!cart.length){ cartItems.innerHTML='<p class="muted">Cart is empty</p>'; return; }
+    cart.forEach(item=>{
+      const w=document.createElement('div'); w.className='cart-item';
+      w.innerHTML=`<div style="display:flex;gap:10px;align-items:center"><img src="${item.image}" alt="${item.name}"><div><strong>${item.name}</strong><br><span>${currencySymbol}${item.price} x ${item.qty}</span></div></div><button class="pill wave">Remove</button>`;
+      const btn=w.querySelector('button'); btn.addEventListener('click',()=>removeFromCart(item.id)); btn.classList.add('danger','wave'); btn.style.background=''; btn.style.color='';
+      cartItems.appendChild(w);
+    });
+  }
+  function loadLikes(){ likes=JSON.parse(localStorage.getItem(LS_KEYS.LIKES)||'[]'); } function saveLikes(){ localStorage.setItem(LS_KEYS.LIKES, JSON.stringify(likes)); }
+  function loadLikeCounts(){ likeCounts=JSON.parse(localStorage.getItem(LS_KEYS.LIKE_COUNTS)||'{}'); dislikeCounts=JSON.parse(localStorage.getItem(LS_KEYS.DISLIKE_COUNTS)||'{}'); }
+  function saveLikeCounts(){ localStorage.setItem(LS_KEYS.LIKE_COUNTS, JSON.stringify(likeCounts)); localStorage.setItem(LS_KEYS.DISLIKE_COUNTS, JSON.stringify(dislikeCounts)); try{ if(window.renderTopThree) window.renderTopThree(); }catch(_){} }
+  function toggleLike(id){ const idx=likes.indexOf(id); if(idx===-1){ likes.push(id); likeCounts[id]=(likeCounts[id]||0)+1; } else { likes.splice(idx,1); dislikeCounts[id]=(dislikeCounts[id]||0)+1; } saveLikes(); saveLikeCounts(); renderProducts(currentPageHome); renderProductsFull(currentPageFull); }
+
+  function viewProduct(item){
+    productViewCard.innerHTML='';
+    const img=document.createElement('img'); img.src=item.image; img.alt=item.name; img.style.width='100%'; img.style.height='220px'; img.style.objectFit='contain'; productViewCard.appendChild(img);
+    const h3=document.createElement('h3'); h3.textContent=item.name; productViewCard.appendChild(h3);
+    const p=document.createElement('p'); p.textContent=item.desc; productViewCard.appendChild(p);
+    const price=document.createElement('strong'); price.textContent=currencySymbol+item.price; productViewCard.appendChild(price);
+    const addBtn=document.createElement('button'); addBtn.className='btn primary wave'; addBtn.textContent='Add to Cart'; addBtn.style.marginTop='12px'; addBtn.addEventListener('click',()=>addToCart(item)); productViewCard.appendChild(addBtn);
+    pages.forEach(p=>p.classList.remove('active')); document.getElementById('product-view').classList.add('active');
+  }
+
+  let selectedProduct=null; let allFeedback=[]; let __DEVICE_ID=null;
+function getDeviceId(){ try{ const s=getSavedSite(); if(s.__deviceId){ __DEVICE_ID=s.__deviceId; return __DEVICE_ID; } const id='d'+Date.now().toString(36)+Math.random().toString(36).slice(2,8); const ns=Object.assign({}, s, {__deviceId:id}); localStorage.setItem(LS_KEYS.SITE, JSON.stringify(ns)); try{Storage.set(LS_KEYS.SITE, JSON.stringify(ns));}catch(_){ } __DEVICE_ID=id; return id; }catch(_){ return '__local__'; } }
+  function setupFeedbackSystem(){
+  /* FB_EDIT_SUPPORT_START */
+  window.EDIT_FB_ID = null;
+  function startEditFeedback(id){
+    try{
+      const fb = (allFeedback||[]).find(f=>f.id===id);
+      if(!fb){ alert('Not found'); return; }
+      const isOwner = !!(currentUser && fb.user && String(fb.user).toLowerCase()===String(currentUser).toLowerCase());
+      if(!(adminLoggedIn || isOwner)){ alert('Only author or admin can edit'); return; }
+      // try to re-select product
+      selectedProduct = (products||[]).find(p=>p.id===fb.productId) || null;
+      /* FB_EDIT_SUPPORT_FALLBACK */
+      if(selectedProduct){
+        feedbackSelectedImg.src = selectedProduct.image||'';
+        feedbackSelectedName.textContent = selectedProduct.name||'';
+        feedbackSelectedPrice.textContent = (currencySymbol||'') + (selectedProduct.price||'');
+        selectedFeedbackProduct.style.display='block';
+      } else {
+        feedbackSelectedImg.src = fb.image||'';
+        feedbackSelectedName.textContent = fb.name||'';
+        feedbackSelectedPrice.textContent = '';
+        selectedFeedbackProduct.style.display='block';
+      }
+      feedbackText.value = fb.text||'';
+      EDIT_FB_ID = id;
+      if(submitFeedbackBtn) submitFeedbackBtn.textContent = 'Update';
+      // scroll to feedback page
+      try{
+        document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+        document.getElementById('feedback').classList.add('active');
+        document.getElementById('feedback').scrollIntoView({behavior:'smooth'});
+      }catch(_){}
+    }catch(e){ console.error(e); alert('Edit failed'); }
+  }
+  /* FB_EDIT_SUPPORT_END */
+  window.startEditFeedback = startEditFeedback;
+
+    loadFeedbacks();
+    feedbackSearch.addEventListener('input', handleFeedbackSearch);
+    submitFeedbackBtn.addEventListener('click', submitFeedback);
+    viewFeedbacksBtn.addEventListener('click', openAllFeedbacksModal);
+    document.getElementById('siteGoodBtn').addEventListener('click',()=>updateSiteFeedback('good'));
+    document.getElementById('siteBadBtn').addEventListener('click',()=>updateSiteFeedback('bad'));
+  }
+  function handleFeedbackSearch(){ const q=feedbackSearch.value.trim().toLowerCase(); feedbackSearchResults.innerHTML=''; if(!q) return; products.filter(p=>p.name.toLowerCase().includes(q)).forEach(item=>{ const b=chip(item.name,()=>selectFeedbackProduct(item)); feedbackSearchResults.appendChild(b); }); }
+  function selectFeedbackProduct(item){ selectedProduct=item; feedbackSelectedImg.src=item.image; feedbackSelectedName.textContent=item.name; feedbackSelectedPrice.textContent=currencySymbol+item.price; selectedFeedbackProduct.style.display='block'; feedbackSearchResults.innerHTML=''; feedbackSearch.value=''; }
+  function loadFeedbacks(){ allFeedback=JSON.parse(localStorage.getItem(LS_KEYS.FEEDBACKS)||'[]'); const siteFb=JSON.parse(localStorage.getItem(LS_KEYS.SITE_FEEDBACK)||'{"good":0,"bad":0}'); goodCount.textContent=siteFb.good; badCount.textContent=siteFb.bad; renderFeedbackList(); }
+  function saveFeedbacks(){ localStorage.setItem(LS_KEYS.FEEDBACKS, JSON.stringify(allFeedback)); }
+
+  function submitFeedback(){
+    const text = feedbackText.value.trim();
+    if(!selectedProduct || !text){ alert('Please select a product and write feedback'); return; }
+    if(window.EDIT_FB_ID){
+      const idx = (allFeedback||[]).findIndex(f=>f.id===window.EDIT_FB_ID);
+      if(idx>-1){
+        const fbOld = allFeedback[idx];
+        const isOwner = !!(currentUser && fbOld.user && String(fbOld.user).toLowerCase()===String(currentUser).toLowerCase());
+        if(!(adminLoggedIn || isOwner)){ alert('Only author or admin can update'); return; }
+        allFeedback[idx] = { ...fbOld, productId: selectedProduct.id, name: selectedProduct.name, image: selectedProduct.image, text, time: new Date().toLocaleString() };
+        saveFeedbacks(); window.EDIT_FB_ID=null; if(submitFeedbackBtn) submitFeedbackBtn.textContent='Submit Feedback';
+        feedbackText.value=''; selectedFeedbackProduct.style.display='none'; selectedProduct=null; renderFeedbackList(); toast('Feedback updated ✓'); return;
+      }
+    }
+    const fb = { id: Date.now(), productId: selectedProduct.id, name: selectedProduct.name, image: selectedProduct.image, text, user: currentUser || 'Guest', did: getDeviceId(), time: new Date().toLocaleString() };
+    allFeedback.push(fb); saveFeedbacks(); feedbackText.value=''; selectedFeedbackProduct.style.display='none'; selectedProduct=null; renderFeedbackList(); toast('Feedback submitted ✓');
+  }
+
+  function renderFeedbackList(){
+    feedbackList.innerHTML='';
+    if(!allFeedback.length){ feedbackList.innerHTML='<p class="muted">No feedback yet</p>'; return; }
+    allFeedback.slice().reverse().forEach(fb=>{
+      const d=document.createElement('div'); d.className='fb-item';
+      const canDel = (adminLoggedIn || (currentUser && (fb.user||'').toLowerCase()===String(currentUser).toLowerCase()) || (fb.did && fb.did===getDeviceId()));
+      d.innerHTML=`
+        <div style="display:flex; gap:10px; align-items:flex-start">
+          <img src="${fb.image||''}" alt="${fb.name}" style="width:72px;height:72px;object-fit:contain;border-radius:8px;box-shadow:var(--shadow)">
+          <div style="flex:1">
+            <strong>${fb.name}</strong>
+            <p style="margin:6px 0">${fb.text}</p>
+            <small class="muted">${fb.user||'Guest'} • ${fb.time}</small>
+          </div>
+          ${canDel?'<div style="display:flex;gap:6px;flex-wrap:wrap"><button class="pill wave warn" data-edit>Edit</button><button class="pill wave danger" data-del>Delete</button></div>':''}
+        </div>`;
+      if(canDel){ const btn=d.querySelector('[data-del]'); if(btn) btn.addEventListener('click',()=>deleteFeedback(fb.id)); const eb=d.querySelector('[data-edit]'); if(eb) eb.addEventListener('click',()=>startEditFeedback(fb.id)); }
+      feedbackList.appendChild(d);
+    });
+  }
+
+  function openAllFeedbacksModal(){
+    allFeedbacks.innerHTML='';
+    if(!allFeedback.length){ allFeedbacks.innerHTML='<p class="muted">No feedback yet</p>'; }
+    else {
+      allFeedback.slice().reverse().forEach(fb=>{
+        const d=document.createElement('div'); d.className='fb-item';
+        const canDel = (adminLoggedIn || (currentUser && (fb.user||'').toLowerCase()===String(currentUser).toLowerCase()) || (fb.did && fb.did===getDeviceId()));
+        d.innerHTML=`
+          <div style="display:flex; gap:10px; align-items:flex-start">
+            <img src="${fb.image||''}" alt="${fb.name}" style="width:72px;height:72px;object-fit:contain;border-radius:8px;box-shadow:var(--shadow)">
+            <div style="flex:1">
+              <strong>${fb.name}</strong>
+              <p style="margin:6px 0">${fb.text}</p>
+              <small class="muted">${fb.user||'Guest'} • ${fb.time}</small>
+            </div>
+            ${canDel?'<div style="display:flex;gap:6px;flex-wrap:wrap"><button class="pill wave warn" data-edit>Edit</button><button class="pill wave danger" data-del>Delete</button></div>':''}
+          </div>`;
+        if(canDel){ const btn=d.querySelector('[data-del]'); if(btn) btn.addEventListener('click',()=>{ deleteFeedback(fb.id); openAllFeedbacksModal(); }); const eb=d.querySelector('[data-edit]'); if(eb) eb.addEventListener('click',()=>{ startEditFeedback(fb.id); document.getElementById('viewFeedbackModal').classList.remove('show'); }); }
+        allFeedbacks.appendChild(d);
+      });
+    }
+    viewFeedbacksModal.classList.add('show');
+  }
+
+  function updateSiteFeedback(type){
+    const siteFb=JSON.parse(localStorage.getItem(LS_KEYS.SITE_FEEDBACK)||'{"good":0,"bad":0}');
+    if(type==='good') siteFb.good+=1; else siteFb.bad+=1;
+    localStorage.setItem(LS_KEYS.SITE_FEEDBACK, JSON.stringify(siteFb));
+    goodCount.textContent=siteFb.good; badCount.textContent=siteFb.bad;
+  }
+
+  let sliderTimer=null;
+  
+    function renderTopThree(){
+    try{
+      topThree.innerHTML='';
+      const list = Array.isArray(products)? products.slice() : [];
+      if(!list.length){ return; }
+      const top = (typeof getTrendingProducts==='function' ? getTrendingProducts(list) : list).slice(0,3);
+      top.forEach(item=>{
+        const card=document.createElement('div'); card.className='small-card';
+        const img=document.createElement('img'); img.src=item.image||''; img.alt=item.name||'';
+        card.appendChild(img); card.addEventListener('click',()=>viewProduct(item));
+        topThree.appendChild(card);
+      });
+    }catch(e){ console.warn('renderTopThree error', e); }
+  }
+  function getTrendingProducts(list){
+    try{
+      const L = Array.isArray(list)? list.slice() : [];
+      const now = Date.now();
+      const scoreOf = (p)=>{
+        const id = p && p.id;
+        const like = (window.likeCounts && window.likeCounts[id]) || 0;
+        const dislike = (window.dislikeCounts && window.dislikeCounts[id]) || 0;
+        const base = like - dislike;
+        const ts = Number(p && (p.createdAt || (typeof id==='number' && id>1e12 ? id : 0))) || 0;
+        const ageDays = ts ? Math.max(1, (now - ts)/86400000) : 90;
+        const rec = ts ? (5/ageDays) : 0; // recent boost
+        return base + rec;
+      };
+      L.sort((a,b)=> scoreOf(b) - scoreOf(a));
+      return L;
+    }catch(e){ return list||[]; }
+  }
+
+  function initSlider(){
+    slides.innerHTML=''; slideDots.innerHTML=''; if(sliderTimer){ clearInterval(sliderTimer); sliderTimer=null;}
+    const list=products||[]; if(!list.length) return; const max=Math.min(list.length,6); let current=0;
+    for(let i=0;i<max;i++){ const item=list[i]; const sdiv=document.createElement('div'); sdiv.className='slide';
+      const img=document.createElement('img'); img.src=item.image; img.alt=item.name; sdiv.appendChild(img); sdiv.addEventListener('click',()=>viewProduct(item)); slides.appendChild(sdiv);
+      const dot=document.createElement('div'); dot.className='dot'+(i===0?' active':''); dot.addEventListener('click',()=>{current=i; update(); reset();}); slideDots.appendChild(dot);
+    }
+    function update(){ slides.style.transform=`translateX(-${current*100}% )`; const ds=slideDots.children; for(let j=0;j<ds.length;j++){ ds[j].classList.toggle('active', j===current);} }
+    function reset(){ if(sliderTimer) clearInterval(sliderTimer); sliderTimer=setInterval(()=>{ current=(current+1)%max; update(); },3000); }
+    update(); reset();
+  }
+
+  
+  function quickShare(){
+    try{
+      const saved = getSavedSite();
+      const url = (saved.publicSiteUrl || saved.publicLink || window.location.href);
+      const data = { title: document.title || 'Daud Store', text: 'Check this out', url };
+      if(navigator.share){
+        navigator.share(data).catch(()=>{ /* ignore cancel */ });
+      } else {
+        // Fallback: open the Share modal (admin-independent)
+        document.getElementById('shareModal').classList.add('show');
+      }
+    }catch(e){
+      try{ document.getElementById('shareModal').classList.add('show'); }catch(_){}
+    }
+  }
+
+  function initAdminPanel(){
+    adminOpenBtn.addEventListener('click',()=>{ try{ if(Storage.get(LS_KEYS.ADMIN_LOGGED_IN)==='true') adminLoggedIn=true; }catch(_){ }
+      const saved = getSavedSite();
+      if(adminLoggedIn){
+        adminPanel.classList.add('active');
+        /* REFILL_PUBLIC_SITE_URL */
+        try{ const s=getSavedSite(); if(s.publicSiteUrl && typeof publicSiteUrlInput!=='undefined' && publicSiteUrlInput){ publicSiteUrlInput.value=s.publicSiteUrl; } }catch(_){}
+        renderUsersList();
+        updateProductsUI(); /* ensure Edit/Delete buttons appear */
+        toast('Admin access granted.');
+      } else {
+        adminGateModal.classList.add('show');
+      }
+    });
+
+    document.querySelectorAll('[data-close]').forEach(btn =>
+      btn.addEventListener('click', e => e.target.closest('.modal').classList.remove('show'))
+    );
+    if(closeAdmin) closeAdmin.addEventListener('click',()=>adminPanel.classList.remove('active'));
+
+    gateLoginBtn.addEventListener('click',()=>{
+      const saved = getSavedSite();
+      const e = (gateEmail.value||'').trim().toLowerCase();
+      const p = (gatePass.value||'').trim();
+      if(e===(saved.adminEmail||'').toLowerCase() && p===(saved.adminPass||'')){
+        currentUser=e; adminLoggedIn=true;
+        Storage.set(LS_KEYS.CURRENT_USER,currentUser);
+        Storage.set(LS_KEYS.ADMIN_LOGGED_IN,'true');
+        Storage.set(LS_KEYS.REMEMBER_ADMIN,'1');
+        urlRememberSet(currentUser, true);
+        adminGateModal.classList.remove('show');try{ if(!Array.isArray(users)) users=[]; const low=String(currentUser).toLowerCase(); if(!users.includes(low)){ users.push(low); localStorage.setItem(LS_KEYS.USERS, JSON.stringify(users)); } }catch(_){ }
+        refreshUserUI(); refreshAdminUI(); updateProductsUI(); /* critical */
+        adminPanel.classList.add('active');
+        toast('Welcome, Admin!');
+      } else { alert('Invalid admin credentials'); }
+    });
+
+    if(logoSetBtn) logoSetBtn.addEventListener('click',uploadLogo);
+    if(addProductBtn) addProductBtn.addEventListener('click',uploadProduct);
+    if(clearProductsBtn) clearProductsBtn.addEventListener('click',clearAllProducts);
+    if(saveSentencesBtn) saveSentencesBtn.addEventListener('click',saveSentences);
+    if(setCurrencyBtn) setCurrencyBtn.addEventListener('click',saveCurrency);
+    if(saveContactsBtn) saveContactsBtn.addEventListener('click',saveContacts);
+    if(openContactsBtn) openContactsBtn.addEventListener('click',openContacts);
+    if(openShare) openShare.addEventListener('click',()=>shareModal.classList.add('show'));
+    if(savePublicLinkBtn) savePublicLinkBtn.addEventListener('click',savePublicLink);
+    if(saveWebsiteUrlBtn) saveWebsiteUrlBtn.addEventListener('click',saveWebsiteUrl);
+    if(copyWebsiteUrlBtn) copyWebsiteUrlBtn.addEventListener('click',()=>{ const s=getSavedSite(); const url=s.publicSiteUrl||window.location.origin; copyToClipboard(url);});
+
+    const ex = document.getElementById('exportJsonBtn');
+    if(ex && typeof exportProductsJson==='function') ex.addEventListener('click', exportProductsJson);
+    if(typeof importJsonBtn !== 'undefined' && importJsonBtn) importJsonBtn.addEventListener('click', ()=> uploadJsonInput && uploadJsonInput.click());
+    if(typeof uploadJsonInput !== 'undefined' && uploadJsonInput) uploadJsonInput.addEventListener('change', handleImportProductsJson);
+
+    const cWa=document.getElementById('contactWhatsapp');
+    const cMs=document.getElementById('contactMessenger');
+    const sWa=document.getElementById('shareWhatsapp');
+    const sMs=document.getElementById('shareMessenger');
+    const cp=document.getElementById('copyLinkBtn');
+    if(cWa) cWa.addEventListener('click',()=>{ const saved=JSON.parse(localStorage.getItem(LS_KEYS.SITE)||'{}'); const n=String(saved.whatsapp||'').replace(/[^0-9]/g,''); const url=n?('https://wa.me/'+n):''; if(url) window.open(url,'_blank'); else alert('No WhatsApp number set');});
+    if(cMs) cMs.addEventListener('click',()=>{ if(messengerLink) window.open(messengerLink,'_blank');});
+    if(sWa) sWa.addEventListener('click',()=>{ const s=getSavedSite(); const url=(s.publicSiteUrl||publicLink||window.location.href); window.open('https://wa.me/?text='+encodeURIComponent(url),'_blank');});
+    if(sMs) sMs.addEventListener('click',()=>{ const s=getSavedSite(); const url=(s.publicSiteUrl||publicLink||window.location.href); window.open('https://m.me/?link='+encodeURIComponent(url),'_blank');});
+    if(cp)  cp.addEventListener('click',()=>{ const s=getSavedSite(); const url=(s.publicSiteUrl||publicLink||window.location.href); copyToClipboard(url);});
+  }
+  function signupUser(){
+    const email=(userEmail.value||'').trim().toLowerCase();
+    const pass=(userPass.value||'').trim();
+    if(!email||!pass){ alert('Enter email & password'); return; }
+    const remember = document.getElementById('rememberMeToggle') ? document.getElementById('rememberMeToggle').checked : true;
+    currentUser=email;
+    if(remember){
+      Storage.set(LS_KEYS.CURRENT_USER,currentUser);
+      Storage.set(LS_KEYS.REMEMBER_USER,'1');
+      urlRememberSet(currentUser,false);
+    }else{
+      Storage.set(LS_KEYS.REMEMBER_USER,'0');
+      Storage.remove(LS_KEYS.CURRENT_USER);
+      urlRememberClear();
+    }
+    alert('Account created and logged in');
+    refreshUserUI();
+    try{
+      if(currentUser){
+        if(!Array.isArray(users)) users=[];
+        const low=String(currentUser).toLowerCase();
+        if(!users.includes(low)) users.push(low);
+        saveUsers(); renderUsersList();
+      }
+    }catch(_){}
+    userModal.classList.remove('show');
+  }
+
+  function loginUser(){
+    const email=(userEmail.value||'').trim().toLowerCase();
+    const pass=(userPass.value||'').trim();
+    if(!email||!pass){ alert('Enter email & password'); return; }
+    const remember = document.getElementById('rememberMeToggle') ? document.getElementById('rememberMeToggle').checked : true;
+    currentUser=email;
+    if(remember){
+      Storage.set(LS_KEYS.CURRENT_USER,currentUser);
+      Storage.set(LS_KEYS.REMEMBER_USER,'1');
+      urlRememberSet(currentUser,false);
+    }else{
+      Storage.set(LS_KEYS.REMEMBER_USER,'0');
+      Storage.remove(LS_KEYS.CURRENT_USER);
+      urlRememberClear();
+    }
+    alert('Logged in');
+    refreshUserUI();
+    try{
+      if(currentUser){
+        if(!Array.isArray(users)) users=[];
+        const low=String(currentUser).toLowerCase();
+        if(!users.includes(low)) users.push(low);
+        saveUsers(); renderUsersList();
+      }
+    }catch(_){}
+    userModal.classList.remove('show');
+  }
+
+  function logoutUser(){
+    try{
+      Storage.remove(LS_KEYS.CURRENT_USER);
+      Storage.remove(LS_KEYS.ADMIN_LOGGED_IN);
+      Storage.set(LS_KEYS.REMEMBER_USER,'0');
+      Storage.set(LS_KEYS.REMEMBER_ADMIN,'0');
+      urlRememberClear();
+      currentUser=null; adminLoggedIn=false;
+      alert('Logged out');
+      refreshUserUI(); refreshAdminUI();
+      if(typeof adminPanel!=='undefined') adminPanel.classList.remove('active');
+    }catch(e){ alert('Logout error'); }
+  }
+
+  function refreshAdminUI(){
+    try{
+      document.querySelectorAll('.admin-only').forEach(el=>{ el.style.display = adminLoggedIn ? '' : 'none'; });
+      if(adminLoggedIn){ renderUsersList(); updateProductsUI(); } /* ensure buttons visible */
+    }catch(e){}
+  }
+
+  function initUserSystem(){
+    loadUsers();
+    try{
+      const remember = Storage.get(LS_KEYS.CURRENT_USER, null);
+      const u = urlRememberGet();
+      if(remember){ currentUser = remember; }
+      else if(u && u.u){ currentUser = u.u; }
+      const saved = getSavedSite();
+      if(Storage.get(LS_KEYS.ADMIN_LOGGED_IN)==='true'){
+        adminLoggedIn = true;
+      }
+    }catch(e){}
+    refreshUserUI(); refreshAdminUI();
+  }
+
+  function checkAdminPersistentLogin(){
+  try{
+    const hashObj = urlRememberGet();
+    const saved = getSavedSite();
+    const adminEmail = (saved.adminEmail||'').toLowerCase();
+    if(hashObj && hashObj.a===true && hashObj.u && currentUser &&
+       hashObj.u.toLowerCase()===adminEmail && currentUser.toLowerCase()===adminEmail){
+      adminLoggedIn = true;
+      Storage.set(LS_KEYS.ADMIN_LOGGED_IN,'true');
+    }
+  }catch(e){}
+  refreshAdminUI();
+}
+    /* Users registry (for admin visibility) */
+  function loadUsers(){ try{ users = JSON.parse(localStorage.getItem(LS_KEYS.USERS)||'[]'); if(!Array.isArray(users)) users=[]; } catch(_){ users = []; } }
+  function saveUsers(){ try{ const uniq = Array.from(new Set((users||[]).map(e => String(e||'').trim().toLowerCase()).filter(Boolean))); localStorage.setItem(LS_KEYS.USERS, JSON.stringify(uniq)); users = uniq; }catch(_){} }
+  function renderUsersList(){
+    const box = document.getElementById('usersList'); if(!box) return;
+    const list = Array.isArray(users) ? users.slice().sort() : []; const gmails = list.filter(u=>/@gmail\.com$/i.test(u));
+    if(!list.length){ box.innerHTML = '<p class="muted">No users yet</p>'; return; }
+    box.innerHTML = '<div><strong>Total: '+list.length+'</strong></div>'
+      + '<ul style="margin:8px 0 0 18px">' + list.map(u=>'<li>'+u+'</li>').join('') + '</ul>'
+      + '<div class="muted" style="margin-top:8px">Gmail ('+gmails.length+'): '+(gmails.join(', ')||'—')+'</div>';
+  }
+
+  /* Products */
+  function saveProducts(){ try{ localStorage.setItem(LS_KEYS.PRODUCTS, JSON.stringify(products)); }catch(_){ } try{ if(window.Storage&&Storage.set) Storage.set(LS_KEYS.PRODUCTS, JSON.stringify(products)); }catch(_){} updateProductsUI(); try{ if(window.renderTopThree) window.renderTopThree(); }catch(_){} }
+  function readFileToDataURL(file){ return new Promise((resolve,reject)=>{ if(!file){ resolve(''); return; } const reader=new FileReader(); reader.onload=e=>resolve(e.target.result); reader.onerror=reject; reader.readAsDataURL(file); }); }
+  async function uploadProduct(){
+    try{
+      const name=(productName && productName.value||'').trim();
+      const price=(productPrice && productPrice.value||'').trim();
+      const desc=(productDesc && productDesc.value||'').trim();
+      const file= productImageInput && productImageInput.files && productImageInput.files[0];
+      if(!name || !price){ alert('Name & price required'); return; }
+      const image = await readFileToDataURL(file);
+      const id = Date.now();
+      const item={ id, name, price, desc, image: image || (DEFAULT_PRODUCTS[0] && DEFAULT_PRODUCTS[0].image) || '', createdAt: id };
+      products.push(item); saveProducts();
+      if(productImageInput) productImageInput.value=''; if(productName) productName.value=''; if(productPrice) productPrice.value=''; if(productDesc) productDesc.value='';
+      toast('Product added ✓');
+    }catch(e){ alert('Upload failed'); }
+  }
+  function editProduct(id){
+    if(!adminLoggedIn){ alert('Admin only'); return; }
+    const idx = products.findIndex(p=>p.id===id); if(idx===-1){ alert('Not found'); return; }
+    const p = products[idx];
+    const nn = prompt('Edit name:', p.name); if(nn===null) return;
+    const np = prompt('Edit price:', p.price); if(np===null) return;
+    const nd = prompt('Edit description:', p.desc||''); if(nd===null) return;
+    products[idx] = {...p, name: (nn||p.name).trim(), price: (np||p.price).trim(), desc: nd};
+    saveProducts(); toast('Product updated ✓');
+  }
+  function deleteProduct(id){
+    if(!adminLoggedIn){ alert('Admin only'); return; }
+    if(!confirm('Delete this product?')) return;
+    products = products.filter(p=>p.id!==id);
+    saveProducts(); toast('Product deleted ✓');
+  }
+
+  /* Misc admin actions */
+  function uploadLogo(){} /* stub */ 
+  function clearAllProducts(){ localStorage.removeItem(LS_KEYS.PRODUCTS); products=DEFAULT_PRODUCTS.slice(); updateProductsUI(); toast('Products cleared'); }
+  function saveSentences(){ const v=(sentencesInput&&sentencesInput.value||'').trim(); const saved=JSON.parse(localStorage.getItem(LS_KEYS.SITE)||'{}'); saved.sentences=v; localStorage.setItem(LS_KEYS.SITE, JSON.stringify(saved)); rotatingSentences=v? v.split(',').map(s=>s.trim()).filter(Boolean):rotatingSentences; toast('Saved sentences'); }
+  function saveCurrency(){ const v=(currencyInput&&currencyInput.value||'').trim(); if(!v){ alert('Enter symbol'); return;} const saved=JSON.parse(localStorage.getItem(LS_KEYS.SITE)||'{}'); saved.currency=v; localStorage.setItem(LS_KEYS.SITE, JSON.stringify(saved)); currencySymbol=v; updateProductsUI(); toast('Currency set'); }
+  function saveContacts(){ const cc=(whatsappCountry&&whatsappCountry.value)||''; const nn=(whatsappNumber&&whatsappNumber.value)||''; const ms=(messengerInput&&messengerInput.value)||''; const saved=JSON.parse(localStorage.getItem(LS_KEYS.SITE)||'{}'); const digits=String(cc+nn).replace(/[^0-9]/g,''); saved.whatsapp = digits; saved.messenger=ms; localStorage.setItem(LS_KEYS.SITE, JSON.stringify(saved)); whatsappLink = digits ? ('https://wa.me/'+digits) : ''; messengerLink=saved.messenger||''; toast('Contacts saved'); }
+  function openContacts(){ const saved=JSON.parse(localStorage.getItem(LS_KEYS.SITE)||'{}'); const n=String(saved.whatsapp||'').replace(/[^0-9]/g,''); const wa=n?('https://wa.me/'+n):''; const ms=saved.messenger||''; if(wa) window.open(wa,'_blank'); else if(ms) window.open(ms,'_blank'); else alert('No contact set'); }
+  function saveWebsiteUrl(){
+  const v=(publicSiteUrlInput&&publicSiteUrlInput.value||'').trim();
+  if(!v){ alert('Enter your website URL'); return; }
+  const saved=JSON.parse(localStorage.getItem(LS_KEYS.SITE)||'{}');
+  saved.publicSiteUrl=v;
+  localStorage.setItem(LS_KEYS.SITE, JSON.stringify(saved));
+  try{ Storage.set(LS_KEYS.SITE, JSON.stringify(saved)); }catch(_){} /* cookie fallback */
+  toast('Website URL saved');
+}
+
+  function savePublicLink(){ const v=(publicLinkInput&&publicLinkInput.value||'').trim(); const saved=JSON.parse(localStorage.getItem(LS_KEYS.SITE)||'{}'); saved.publicLink=v; localStorage.setItem(LS_KEYS.SITE, JSON.stringify(saved)); publicLink=v; toast('Public link saved'); }
+  function exportProductsJson(){
+    try{
+      const saved = getSavedSite();
+      const payload = { settings: saved, products: products };
+      const jsonStr = JSON.stringify(payload,null,2);
+      const blob = new Blob([jsonStr], {type:'application/json'});
+      const url = (window.URL||window.webkitURL).createObjectURL(blob);
+      const a=document.createElement('a'); a.href=url; a.download='products.json'; document.body.appendChild(a); a.click();
+      setTimeout(()=>{ (window.URL||window.webkitURL).revokeObjectURL(url); a.remove(); }, 0);
+      toast('Download started');
+    }catch(e){ alert('Export failed'); }
+  }
+  function handleImportProductsJson(evt){
+    const f = evt && evt.target && evt.target.files && evt.target.files[0];
+    if(!f){ alert('No file'); return; }
+    const reader = new FileReader();
+    reader.onload = (e)=>{
+      try{
+        const obj = JSON.parse(e.target.result);
+        const arr = Array.isArray(obj)? obj : (obj && obj.products) || [];
+        if(arr.length){ products = arr; localStorage.setItem(LS_KEYS.PRODUCTS, JSON.stringify(products)); updateProductsUI(); toast('Imported products'); }
+        if(obj && obj.settings) importSettingsFromRemote(obj.settings);
+      }catch(err){ alert('Invalid JSON'); }
+    };
+    reader.readAsText(f);
+  }
+  function copyToClipboard(t){ try{ navigator.clipboard && navigator.clipboard.writeText ? navigator.clipboard.writeText(t) : document.execCommand('copy'); toast('Copied ✓'); }catch(_){ prompt('Copy', t); } }
+
+    /* Feedback delete (author or admin / same-device) */
+  function deleteFeedback(id){
+    const fbItem = (allFeedback||[]).find(f=>f.id===id);
+    const isDeviceOwner = !!(fbItem && fbItem.did && typeof getDeviceId==='function' && fbItem.did===getDeviceId());
+    const isOwner = !!(fbItem && currentUser && fbItem.user && String(fbItem.user).toLowerCase()===String(currentUser).toLowerCase());
+    if(!(adminLoggedIn || isOwner || isDeviceOwner)){ alert('Only author/admin/device can delete'); return; }
+    if(!confirm('Delete this feedback?')) return;
+    allFeedback = (allFeedback||[]).filter(f=>f.id!==id);
+    saveFeedbacks(); renderFeedbackList(); toast('Feedback deleted');
+  }
+  function autoRotateText(){ let idx=0; setInterval(()=>{ rotatingText.textContent=rotatingSentences[idx]; idx=(idx+1)%rotatingSentences.length; },2800); }
+  function toast(msg){ const el=document.getElementById('adminAlert'); if(!el) return; el.textContent=msg; el.classList.remove('hidden'); clearTimeout(toast._t); toast._t=setTimeout(()=>el.classList.add('hidden'),2200); }
+
+  document.querySelectorAll('.modal').forEach(m => {
+    m.addEventListener('click', (e) => { const card = m.querySelector('.modal-card'); if(!card.contains(e.target)) m.classList.remove('show'); });
+  });
+  document.addEventListener('keydown', (e)=>{ if(e.key==='Escape'){ document.querySelectorAll('.modal.show').forEach(m=>m.classList.remove('show')); } });
+
+  (function(){
+    var src=''; if(urlRememberGet()) src+='URL-hash '; if(Storage.get(LS_KEYS.CURRENT_USER)) src+='Storage ';
+    if(src){ var el=document.getElementById('adminAlert'); if(el){ el.textContent='Login restored via: '+src.trim(); el.classList.remove('hidden'); setTimeout(()=>el.classList.add('hidden'), 1800);} }
+  })();
+  </script>
+
+<!-- Persist Sync Endpoint / App Key / Remote URL across visits -->
+<script>
+(function(){
+  const LS_SITE = (window.LS_KEYS && LS_KEYS.SITE) || 'site';
+  function getSite(){ try{return JSON.parse(localStorage.getItem(LS_SITE)||'{}')}catch(e){return {}} }
+  function setSite(x){ try{ localStorage.setItem(LS_SITE, JSON.stringify(x)); }catch(e){} }
+
+  function initPersist(){
+    const s = getSite();
+    const ep  = document.getElementById('syncEndpointInput');
+    const key = document.getElementById('syncAppKeyInput');
+    const raw = document.getElementById('remoteUrl') || document.getElementById('publicLinkInput');
+
+    // restore saved values
+    if (s && s.syncEndpoint && ep) ep.value = s.syncEndpoint;
+    if (s && s.syncAppKey   && key) key.value = s.syncAppKey;
+    const savedRaw = (s && s.publicLink) || localStorage.getItem('remoteProductsUrl');
+    if (savedRaw && raw) raw.value = savedRaw;
+
+    function persist(){
+      const ss = getSite();
+      if (ep)  ss.syncEndpoint = (ep.value||'').trim();
+      if (key) ss.syncAppKey   = (key.value||'').trim();
+      const rv = raw ? (raw.value||'').trim() : '';
+      if (rv){
+        ss.publicLink = rv; // mirror so older code also reads it
+        try{ localStorage.setItem('remoteProductsUrl', rv); }catch(e){}
+      }
+      setSite(ss);
+    }
+
+    ['blur','change'].forEach(evt=>{
+      if (ep)  ep.addEventListener(evt, persist);
+      if (key) key.addEventListener(evt, persist);
+      if (raw) raw.addEventListener(evt, persist);
+    });
+
+    const saveSync = document.getElementById('saveSyncEndpointBtn');
+    if (saveSync) saveSync.addEventListener('click', persist);
+
+    const savePublic = document.getElementById('savePublicLinkBtn');
+    if (savePublic) savePublic.addEventListener('click', persist);
+  }
+
+  if (document.readyState !== 'loading') { initPersist(); } else { document.addEventListener('DOMContentLoaded', initPersist); }
+})();
+</script>
+
+
+<script>
+(function(){
+  const LS_SITE = (window.LS_KEYS && LS_KEYS.SITE) || 'site';
+
+  function getSite(){ try{return JSON.parse(localStorage.getItem(LS_SITE)||'{}')}catch(e){return {}} }
+  function setSite(obj){ try{ localStorage.setItem(LS_SITE, JSON.stringify(obj||{})); }catch(e){} }
+  function toastMsg(t){ try{ const el=document.getElementById('adminAlert'); if(!el) return; el.textContent=t; el.classList.remove('hidden'); clearTimeout(toastMsg._t); toastMsg._t=setTimeout(()=>el.classList.add('hidden'),2200);}catch(e){} }
+
+  // Build payload from current site settings + products
+  function buildProductsPayload(){
+    let settings = {}; 
+    try{ settings = JSON.parse(localStorage.getItem(LS_SITE)||'{}'); }catch(_){ settings = {}; }
+    let products = [];
+    try{ products = JSON.parse(localStorage.getItem((window.LS_KEYS&&LS_KEYS.PRODUCTS)||'daudProducts')||'[]'); }catch(_){ products = []; }
+    return { settings, products };
+  }
+
+  // Save remote RAW URL
+  function saveRemoteURL(){
+    const input = document.getElementById('remoteUrl');
+    const url = (input && input.value || '').trim();
+    if(!url){ alert('Remote URL is empty'); return; }
+    const s = getSite();
+    s.publicLink = url; // keep for backward-compat with existing code
+    try{ localStorage.setItem('remoteProductsUrl', url); }catch(_){}
+    setSite(s);
+    toastMsg('Remote URL saved');
+  }
+
+  // Pull JSON from remote and apply
+  async function pullFromRemote(){
+    const input = document.getElementById('remoteUrl');
+    const stored = localStorage.getItem('remoteProductsUrl') || '';
+    const s = getSite();
+    const url = (input && input.value || s.publicLink || stored || '').trim();
+    if(!url){ alert('Set Remote products.json URL first'); return; }
+    try{
+      const res = await fetch(url, { cache: 'no-store' });
+      if(!res.ok){ throw new Error('HTTP '+res.status); }
+      const data = await res.json();
+      let products = [], settings = null;
+      if(Array.isArray(data)){ products = data; }
+      else if(data && (Array.isArray(data.products) || typeof data.settings === 'object')){
+        products = Array.isArray(data.products) ? data.products : [];
+        settings = data.settings || null;
+      } else {
+        throw new Error('Unsupported JSON shape');
+      }
+      if(products){ localStorage.setItem((window.LS_KEYS&&LS_KEYS.PRODUCTS)||'daudProducts', JSON.stringify(products)); }
+      if(settings){ 
+        const saved = getSite(); Object.assign(saved, settings); setSite(saved);
+      }
+      if(typeof window.updateProductsUI==='function') window.updateProductsUI();
+      if(typeof window.importSettingsFromRemote==='function' && settings){ window.importSettingsFromRemote(settings); }
+      toastMsg('Pulled '+(products?products.length:0)+' products from remote ✓');
+    }catch(e){
+      alert('Pull failed: '+ e.message);
+      console.error(e);
+    }
+  }
+
+  // Save endpoint/app key
+  function saveSyncEndpoint(){
+    const epEl = document.getElementById('syncEndpointInput');
+    const keyEl = document.getElementById('syncAppKeyInput');
+    const s = getSite();
+    s.syncEndpoint = (epEl && epEl.value || '').trim();
+    s.syncAppKey   = (keyEl && keyEl.value || '').trim();
+    setSite(s);
+    toastMsg('Endpoint saved');
+  }
+
+  // POST payload to endpoint
+  async function testPush(){
+    const s = getSite();
+    let endpoint = (document.getElementById('syncEndpointInput') && document.getElementById('syncEndpointInput').value || s.syncEndpoint || '').trim();
+    const appKey = (document.getElementById('syncAppKeyInput') && document.getElementById('syncAppKeyInput').value || s.syncAppKey || '').trim();
+    if(!endpoint){ alert('Set Sync Endpoint first'); return; }
+    const payload = buildProductsPayload();
+    try{
+      const headers = { 'Content-Type': 'application/json' };
+      if(appKey){ headers['X-App-Key'] = appKey; }
+      const res = await fetch(endpoint, { method:'POST', headers, body: JSON.stringify(payload) });
+      const text = await res.text();
+      if(res.ok){ toastMsg('Test Push OK'); }
+      else{ alert('Failed: '+res.status+' '+text); }
+    }catch(e){
+      alert('Push error: '+e.message);
+    }
+  }
+
+  function initRemoteSyncUI(){
+    // Wire buttons
+    const saveRemote = document.getElementById('saveRemoteUrlBtn');
+    const pullNow = document.getElementById('pullNowBtn');
+    const saveEp = document.getElementById('saveSyncEndpointBtn');
+    const testBtn = document.getElementById('testPushBtn');
+    if(saveRemote) saveRemote.addEventListener('click', saveRemoteURL);
+    if(pullNow) pullNow.addEventListener('click', pullFromRemote);
+    if(saveEp) saveEp.addEventListener('click', saveSyncEndpoint);
+    if(testBtn) testBtn.addEventListener('click', testPush);
+
+    // Restore inputs from storage
+    const s = getSite();
+    const raw = document.getElementById('remoteUrl');
+    if(raw && (s.publicLink || localStorage.getItem('remoteProductsUrl'))) raw.value = s.publicLink || localStorage.getItem('remoteProductsUrl') || '';
+    const ep  = document.getElementById('syncEndpointInput');
+    const key = document.getElementById('syncAppKeyInput');
+    if(ep && s.syncEndpoint) ep.value = s.syncEndpoint;
+    if(key && s.syncAppKey) key.value = s.syncAppKey;
+  }
+  if (document.readyState !== 'loading') { initRemoteSyncUI(); }
+  else { document.addEventListener('DOMContentLoaded', initRemoteSyncUI); }
+})();
+</script>
+
+
+<div id="footbar" aria-label="Quick nav">
+  <div class="fb-wrap">
+    <button class="pill primary wave" data-go="home">Home</button>
+    <button class="pill wave" data-go="products">Products</button>
+    <button class="pill wave" data-go="feedback">Feedback</button>
+    <button class="pill wave" data-go="contact">Contact</button>
+    <button class="pill wave" data-go="cart">Cart</button>
+  </div>
+</div>
+<script>
+  function gotoPage(id){ try{ document.querySelectorAll('.page').forEach(p=>p.classList.remove('active')); document.getElementById(id).classList.add('active'); window.scrollTo({top:0,behavior:'smooth'});
+  /* footbar active toggle */
+  const btns=document.querySelectorAll('#footbar .pill'); btns.forEach(b=>b.classList.remove('active')); const cur=[...btns].find(b=>b.getAttribute('data-go')===id); if(cur) cur.classList.add('active');
+}catch(e){} }
+  (function(){ try{ document.querySelectorAll('#footbar [data-go]').forEach(b=> b.addEventListener('click', e=> gotoPage(e.currentTarget.getAttribute('data-go')) ));
+try{ const first=document.querySelector('#footbar [data-go="home"]'); if(first) first.classList.add('active'); }catch(e){} }catch(e){} })();
+</script>
+
+<script>window.AUTO_FETCH_LOCAL_PRODUCTS=true; window.HOME_PAGE_SIZE=9;</script>
+<!-- PATCH: App fixes injected on 2025-11-06. -->
+<script>
+// ====== Patch: Stable device id, product pagination > 3, merge remote products, show Gmail in Admin ======
+// These overrides are appended after original scripts so they take precedence.
+
+(function(){
+
+  // ---- 1) Stable device id so feedback edit/delete is visible consistently ----
+  // Requires LS_KEYS.SITE to exist. Falls back safely.
+  try {
+    window.getDeviceId = function getDeviceId() {
+      try {
+        const key = (window.LS_KEYS && window.LS_KEYS.SITE) || "__SITE__";
+        let saved = {};
+        try { saved = JSON.parse(localStorage.getItem(key) || '{}'); } catch(_e) { saved = {}; }
+        if(!saved.__deviceId){
+          const rid = (window.crypto && window.crypto.randomUUID && window.crypto.randomUUID()) ||
+                      ('d' + Date.now().toString(36) + Math.random().toString(36).slice(2,8));
+          saved.__deviceId = rid;
+          localStorage.setItem(key, JSON.stringify(saved));
+        }
+        window.__DEVICE_ID = saved.__deviceId;
+        return window.__DEVICE_ID;
+      } catch(_e) {
+        window.__DEVICE_ID = '__local__';
+        return window.__DEVICE_ID;
+      }
+    }
+  } catch(_e) { /* ignore */ }
+
+  // ---- 2) Product grid shows more than 3 (configurable), keep after refresh with merge ----
+  // Use HOME_PAGE_SIZE for home pagination (default 9)
+  window.HOME_PAGE_SIZE = window.HOME_PAGE_SIZE || 9;
+
+  // Defensive helpers
+  const pageButton = (label, handler) => {
+    const b = document.createElement('button');
+    b.textContent = label;
+    b.type = 'button';
+    b.addEventListener('click', handler);
+    return b;
+  };
+
+  // Override renderProducts if present; otherwise create a safe one using globals
+  try {
+    window.renderProducts = function renderProducts(page) {
+      try {
+        const size = window.HOME_PAGE_SIZE || 9;
+        const productsGrid = document.getElementById('productsGrid') || document.querySelector('[data-products-grid]') || document.body;
+        const pagination = document.getElementById('pagination') || document.querySelector('[data-pagination]') || document.createElement('div');
+        window.currentPageHome = page || 1;
+        const list = Array.isArray(window.products) ? window.products : [];
+        productsGrid.innerHTML = '';
+        if (pagination && pagination.parentElement) pagination.innerHTML = '';
+
+        if(!list.length) {
+          const msg = document.createElement('div');
+          msg.className = 'muted';
+          msg.style.textAlign = 'center';
+          msg.style.padding = '12px';
+          msg.textContent = 'No products available. Please log in as admin to add products.';
+          productsGrid.appendChild(msg);
+        } else {
+          const start = (window.currentPageHome - 1) * size;
+          const pageItems = list.slice(start, start + size);
+          const cardMaker = (window.createProductCard || ((p)=>{
+            const d=document.createElement('div'); d.textContent=p.title || p.name || ('#'+(p.id||'')); return d;
+          }));
+          pageItems.forEach(p => productsGrid.appendChild(cardMaker(p, false)));
+          const pagesCount = Math.ceil(list.length / size);
+
+          if (pagination) {
+            const ensureInDom = () => { if (!pagination.parentElement) (productsGrid.parentElement||document.body).appendChild(pagination); };
+            ensureInDom();
+            if(pagesCount>1) {
+              const prev = pageButton('Prev', ()=> window.currentPageHome>1 && window.renderProducts(window.currentPageHome-1));
+              if(window.currentPageHome===1) prev.disabled=true; pagination.appendChild(prev);
+            }
+            for (let i=1; i<=pagesCount; i++) {
+              const b = pageButton(String(i), ()=> window.renderProducts(i));
+              if(i===window.currentPageHome) b.classList.add('active');
+              pagination.appendChild(b);
+            }
+            if(pagesCount>1) {
+              const next = pageButton('Next', ()=> window.currentPageHome<pagesCount && window.renderProducts(window.currentPageHome+1));
+              if(window.currentPageHome===pagesCount) next.disabled=true; pagination.appendChild(next);
+            }
+          }
+        }
+      } catch(e) { console.warn('renderProducts patch error', e); }
+    }
+  } catch(_e) { /* ignore */ }
+
+  // Override loadProducts to MERGE remote products.json instead of replacing local
+  try {
+    window.loadProducts = function loadProducts() {
+      try { window.products = Array.isArray(window.DEFAULT_PRODUCTS) ? window.DEFAULT_PRODUCTS.slice() : (Array.isArray(window.products)? window.products : []); } catch(_e){ window.products = Array.isArray(window.products)? window.products : []; }
+      try {
+        const local = JSON.parse(localStorage.getItem(window.LS_KEYS && window.LS_KEYS.PRODUCTS || '__PRODUCTS__') || '[]');
+        if (Array.isArray(local) && local.length) window.products = local;
+      } catch(_e) { /* ignore */ }
+
+      // Update UI once with local
+      if (typeof window.updateProductsUI === 'function') window.updateProductsUI();
+      else if (typeof window.renderProducts === 'function') window.renderProducts(1);
+
+      // Toggleable auto-fetch
+      const AUTO_FETCH_LOCAL_PRODUCTS = (typeof window.AUTO_FETCH_LOCAL_PRODUCTS === 'boolean') ? window.AUTO_FETCH_LOCAL_PRODUCTS : true;
+
+      if ((location.protocol === 'http:' || location.protocol === 'https:') && AUTO_FETCH_LOCAL_PRODUCTS) {
+        fetch('products.json?' + Date.now())
+          .then(r => r.ok ? r.json() : Promise.reject(new Error('HTTP '+r.status)))
+          .then(remote => {
+            let remoteArr = [];
+            if (Array.isArray(remote)) remoteArr = remote;
+            else if (remote && Array.isArray(remote.products)) remoteArr = remote.products;
+
+            if (remoteArr && remoteArr.length) {
+              const existing = new Map((Array.isArray(window.products) ? window.products : []).map(p => [p && p.id, p]));
+              remoteArr.forEach(p => existing.set(p && p.id, p)); // remote wins on same id
+              window.products = Array.from(existing.values());
+              try { localStorage.setItem(window.LS_KEYS && window.LS_KEYS.PRODUCTS || '__PRODUCTS__', JSON.stringify(window.products)); } catch(_e) { /* ignore */ }
+              if (typeof window.updateProductsUI === 'function') window.updateProductsUI();
+              else if (typeof window.renderProducts === 'function') window.renderProducts(1);
+            }
+            if (remote && remote.settings && typeof window.importSettingsFromRemote === 'function') {
+              window.importSettingsFromRemote(remote.settings);
+            }
+          })
+          .catch(_e => { /* ignore fetch errors silently */ });
+      }
+    }
+  } catch(_e) { /* ignore */ }
+
+  // ---- 3) Admin "Registered Users": ensure current user saved & show Gmail nicely ----
+  try {
+    window.loadUsers = function loadUsers(){
+      try { window.users = JSON.parse(localStorage.getItem(window.LS_KEYS && window.LS_KEYS.USERS || '__USERS__') || '[]'); }
+      catch(_e) { window.users = []; }
+      const cur = (window.Storage && window.Storage.get) ? window.Storage.get(window.LS_KEYS && window.LS_KEYS.CURRENT_USER || '__CURRENT_USER__', null) : null;
+      if (cur) {
+        const low = String(cur).toLowerCase();
+        if (!Array.isArray(window.users)) window.users = [];
+        if (!window.users.includes(low)) {
+          window.users.push(low);
+          try { localStorage.setItem(window.LS_KEYS && window.LS_KEYS.USERS || '__USERS__', JSON.stringify(window.users)); } catch(_e) { /* ignore */ }
+        }
+      }
+    }
+  } catch(_e) { /* ignore */ }
+
+  try {
+    window.renderUsersList = function renderUsersList(){
+      const box = document.getElementById('usersList') || document.querySelector('[data-users-list]');
+      if(!box) return;
+      const list = Array.isArray(window.users) ? window.users.slice().sort() : [];
+      const gmails = list.filter(u => /@gmail\.com$/i.test(String(u||'')));
+      if(!list.length) { box.innerHTML = '<p class="muted">No users yet</p>'; return; }
+
+      const items = list.map(u => '<li><a href="mailto:'+String(u)+'">'+String(u)+'</a></li>').join('');
+      box.innerHTML =
+        '<div><strong>Total: '+list.length+'</strong></div>' +
+        '<ul style="margin:8px 0 0 18px">'+ items +'</ul>' +
+        '<div class="muted" style="margin-top:8px">Gmail ('+gmails.length+'): '+(gmails.join(', ')||'—')+'</div>';
+    }
+  } catch(_e) { /* ignore */ }
+
+  // Kick once on DOM ready if existing code hasn't already
+  try {
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+      if (typeof window.getDeviceId === 'function') window.getDeviceId();
+    } else {
+      document.addEventListener('DOMContentLoaded', function(){
+        if (typeof window.getDeviceId === 'function') window.getDeviceId();
+      });
+    }
+  } catch(_e) { /* ignore */ }
+
+})();
+</script>
+
+<!-- R3 PATCH: votes + separate like/dislike + persist tweaks -->
+<script>
+(function(){
+  // --- 0) Safe user key (email or device) ---
+  function getUserKey(){
+    try{
+      if (window.currentUser) return String(window.currentUser).toLowerCase();
+      if (typeof window.getDeviceId === 'function') return '__device__:' + window.getDeviceId();
+    }catch(_){}
+    return '__device__';
+  }
+
+  // --- 1) Robust vote store: votes[productId][userKey] = 'like' | 'dislike' ---
+  const VKEY = (window.VOTES_KEY || 'daudVotes');
+  function loadVotes(){
+    try{
+      const raw = localStorage.getItem(VKEY);
+      const obj = raw ? JSON.parse(raw) : {};
+      return (obj && typeof obj === 'object') ? obj : {};
+    }catch(_){ return {}; }
+  }
+  function saveVotes(v){ try{ localStorage.setItem(VKEY, JSON.stringify(v||{})); }catch(_){ } }
+
+  // Keep global reference (override any previous simple map)
+  window.votes = loadVotes();
+
+  // Like/dislike counters live in likeCounts/dislikeCounts; ensure objects
+  if(!window.likeCounts || typeof window.likeCounts !== 'object'){ window.likeCounts = {}; }
+  if(!window.dislikeCounts || typeof window.dislikeCounts !== 'object'){ window.dislikeCounts = {}; }
+
+  // Update counters helpers
+  function decCount(obj, id){ obj[id] = Math.max(0, (obj[id]||0) - 1); }
+  function incCount(obj, id){ obj[id] = (obj[id]||0) + 1; }
+
+  // Public setter
+  window.setVote = function setVote(productId, kind){ // kind: 'like' | 'dislike' | null
+    try{
+      const u = getUserKey();
+      const pid = String(productId);
+      const byPid = window.votes[pid] && typeof window.votes[pid] === 'object' ? window.votes[pid] : {};
+      const prev = byPid[u] || null;
+
+      // no-op toggles
+      if(prev === kind){
+        if(prev === 'like') decCount(window.likeCounts, pid);
+        if(prev === 'dislike') decCount(window.dislikeCounts, pid);
+        delete byPid[u];
+        if(Object.keys(byPid).length) window.votes[pid] = byPid;
+        else delete window.votes[pid];
+        saveVotes(window.votes);
+        if(typeof window.saveLikeCounts === 'function') window.saveLikeCounts();
+        return;
+      }
+
+      // switching
+      if(prev === 'like') decCount(window.likeCounts, pid);
+      if(prev === 'dislike') decCount(window.dislikeCounts, pid);
+
+      if(kind === 'like'){ incCount(window.likeCounts, pid); byPid[u] = 'like'; }
+      else if(kind === 'dislike'){ incCount(window.dislikeCounts, pid); byPid[u] = 'dislike'; }
+      else { delete byPid[u]; }
+
+      // persist
+      if(Object.keys(byPid).length) window.votes[pid] = byPid;
+      else delete window.votes[pid];
+      saveVotes(window.votes);
+      if(typeof window.saveLikeCounts === 'function') window.saveLikeCounts();
+    }catch(e){ console.warn('setVote error', e); }
+  };
+
+  // --- 2) Override product card to show separate buttons ---
+  window.createProductCard = function(item, withView){
+    const d=document.createElement('div'); d.className='product-card';
+    const img=document.createElement('img'); img.src=item.image; img.alt=item.name; d.appendChild(img);
+    const meta=document.createElement('div'); meta.className='product-meta'; meta.innerHTML=`<h4>${item.name}</h4><p>${(window.currencySymbol||'৳')}${item.price}</p>`; d.appendChild(meta);
+
+    const actions=document.createElement('div'); actions.className='card-actions';
+    const cartBtn=chip('Add to Cart',()=>addToCart(item)); actions.appendChild(cartBtn);
+
+    const pid = String(item.id);
+    const u = getUserKey();
+    const vote = (window.votes && window.votes[pid] && window.votes[pid][u]) || null;
+    const likeCount=(window.likeCounts && window.likeCounts[pid]) || 0;
+    const dislikeCount=(window.dislikeCounts && window.dislikeCounts[pid]) || 0;
+
+    const likeBtn=chip('👍 Like ('+likeCount+')',()=>{
+      window.setVote(item.id,'like');
+      // refresh UIs
+      if(typeof window.renderProducts==='function') window.renderProducts(window.currentPageHome||1);
+      if(typeof window.renderProductsFull==='function') window.renderProductsFull(window.currentPageFull||1);
+      if(typeof window.renderTopThree==='function') window.renderTopThree();
+    });
+    const dislikeBtn=chip('👎 Dislike ('+dislikeCount+')',()=>{
+      window.setVote(item.id,'dislike');
+      if(typeof window.renderProducts==='function') window.renderProducts(window.currentPageHome||1);
+      if(typeof window.renderProductsFull==='function') window.renderProductsFull(window.currentPageFull||1);
+      if(typeof window.renderTopThree==='function') window.renderTopThree();
+    });
+    if(vote==='like') likeBtn.classList.add('primary');
+    if(vote==='dislike') dislikeBtn.classList.add('primary');
+    actions.appendChild(likeBtn);
+    actions.appendChild(dislikeBtn);
+
+    const shareBtn=chip('Share',()=>quickShare(), true); actions.appendChild(shareBtn);
+    const fbBtn=chip('Feedback',()=>{ try{ selectFeedbackProduct(item); pages.forEach(p=>p.classList.remove('active')); document.getElementById('feedback').classList.add('active'); }catch(e){ console.warn(e); } }); actions.appendChild(fbBtn);
+    if(withView){ actions.appendChild(chip('View',()=>viewProduct(item))); }
+    if(window.adminLoggedIn){
+      const eBtn=chip('Edit',()=>editProduct(item.id));  eBtn.classList.add('warn','wave'); actions.appendChild(eBtn);
+      const dBtn=chip('Delete',()=>deleteProduct(item.id)); dBtn.classList.add('danger','wave'); actions.appendChild(dBtn);
+    }
+    d.appendChild(actions); return d;
+  };
+
+  // --- 3) Ensure HOME_PAGE_SIZE respected in renderProducts (if earlier patch missing) ---
+  if(typeof window.renderProducts === 'function'){
+    const _orig = window.renderProducts;
+    window.renderProducts = function(page){
+      try{
+        const size = window.HOME_PAGE_SIZE || 9;
+        // If original still uses fixed 3, we call our own pagination
+        const grid = document.getElementById('productsGrid');
+        const pager = document.getElementById('pagination');
+        if(grid && pager){
+          window.currentPageHome = page||1;
+          const arr = Array.isArray(window.products) ? window.products : [];
+          grid.innerHTML = ''; pager.innerHTML='';
+          if(!arr.length){
+            const msg=document.createElement('div'); msg.className='muted'; msg.style.textAlign='center'; msg.style.padding='12px';
+            msg.textContent='No products available. Please log in as admin to add products.'; grid.appendChild(msg); return;
+          }
+          const start = (window.currentPageHome-1)*size;
+          const pageItems = arr.slice(start, start+size);
+          pageItems.forEach(p=>grid.appendChild(window.createProductCard(p,false)));
+          const pagesCount = Math.ceil(arr.length/size);
+          if(pagesCount>1){
+            const prev=pageButton('Prev',()=>window.currentPageHome>1 && window.renderProducts(window.currentPageHome-1));
+            if(window.currentPageHome===1) prev.disabled=true; pager.appendChild(prev);
+          }
+          for(let i=1;i<=pagesCount;i++){
+            const b=pageButton(i,()=>window.renderProducts(i));
+            if(i===window.currentPageHome) b.classList.add('active'); pager.appendChild(b);
+          }
+          if(pagesCount>1){
+            const next=pageButton('Next',()=>window.currentPageHome<pagesCount && window.renderProducts(window.currentPageHome+1));
+            if(window.currentPageHome===pagesCount) next.disabled=true; pager.appendChild(next);
+          }
+          return;
+        }
+      }catch(e){ /* fallback to original */ }
+      return _orig(page);
+    };
+  }
+
+  // --- 4) Reinforce no remote overwrite: respect AUTO flag even if earlier code runs ---
+  try{
+    window.AUTO_FETCH_LOCAL_PRODUCTS = (typeof window.AUTO_FETCH_LOCAL_PRODUCTS==='boolean') ? window.AUTO_FETCH_LOCAL_PRODUCTS : false;
+    if(typeof window.loadProducts === 'function'){
+      const _lp = window.loadProducts;
+      window.loadProducts = function(){
+        // Call original first to populate local/default
+        _lp();
+        // If any fetch was scheduled, it will be merge-safe by bottom patch.
+        // Nothing else to do here.
+      };
+    }
+  }catch(_){}
+
+  // --- 5) Ensure createdAt set on uploadProduct (without rewriting whole fn) ---
+  try{
+    if (typeof window.uploadProduct === 'function'){
+      const _up = window.uploadProduct;
+      window.uploadProduct = async function(){
+        const beforeLen = (Array.isArray(window.products)? window.products.length : 0);
+        await _up();
+        // set createdAt for the last added item if missing
+        try{
+          const arr = Array.isArray(window.products)? window.products : [];
+          if(arr.length > beforeLen){
+            const last = arr[arr.length-1];
+            if(last && !last.createdAt){ last.createdAt = Date.now(); localStorage.setItem(LS_KEYS.PRODUCTS, JSON.stringify(arr)); }
+          }
+        }catch(_){}
+        if(typeof window.renderTopThree==='function') window.renderTopThree();
+      };
+    }
+  }catch(_){}
+
+  // --- 6) Kick a UI refresh to apply changes on first load ---
+  document.addEventListener('DOMContentLoaded', function(){
+    try{
+      if(typeof window.updateProductsUI==='function') window.updateProductsUI();
+      else if(typeof window.renderProducts==='function') window.renderProducts(1);
+      if(typeof window.renderTopThree==='function') window.renderTopThree();
+    }catch(_){}
+  });
+
+})();
+</script>
+
+<!-- SAFE FINAL PATCH (r4): persist & admin hardening -->
+<script>
+(function(){
+  // Ensure flags
+  window.HOME_PAGE_SIZE = window.HOME_PAGE_SIZE || 9;
+  window.AUTO_FETCH_LOCAL_PRODUCTS = (typeof window.AUTO_FETCH_LOCAL_PRODUCTS==='boolean') ? window.AUTO_FETCH_LOCAL_PRODUCTS : false;
+
+  // Robust save with cookie fallback
+  window.saveProducts = function(){
+    try{ localStorage.setItem(LS_KEYS.PRODUCTS, JSON.stringify(products)); }catch(_){}
+    try{ if(window.Storage && Storage.set) Storage.set(LS_KEYS.PRODUCTS, JSON.stringify(products)); }catch(_){}
+    if (typeof updateProductsUI==='function') updateProductsUI();
+    try{ if(window.renderTopThree) window.renderTopThree(); }catch(_){}
+  };
+
+  // Hard override: merge remote, never replace; read from Storage fallback too
+  window.loadProducts = function(){
+    try{ products = Array.isArray(DEFAULT_PRODUCTS)? DEFAULT_PRODUCTS.slice(): (Array.isArray(products)? products : []); }catch(_){ products = Array.isArray(products)? products : []; }
+    try{
+      const localStr = (localStorage.getItem(LS_KEYS.PRODUCTS) || (window.Storage&&Storage.get? Storage.get(LS_KEYS.PRODUCTS,'[]') : '[]'));
+      const localArr = JSON.parse(localStr||'[]');
+      if(Array.isArray(localArr) && localArr.length){ products = localArr; }
+    }catch(_){}
+    if (typeof updateProductsUI==='function') updateProductsUI(); else if(typeof renderProducts==='function') renderProducts(1);
+
+    const AUTO = !!window.AUTO_FETCH_LOCAL_PRODUCTS;
+    if(!AUTO) return; // stop remote overwrite by default
+
+    if(!(location.protocol==='http:'||location.protocol==='https:')) return;
+    fetch('products.json?'+Date.now()).then(r=>r.ok?r.json():Promise.reject()).then(remote=>{
+      let remoteArr=[];
+      if(Array.isArray(remote)) remoteArr=remote;
+      else if(remote && Array.isArray(remote.products)) remoteArr=remote.products;
+      if(remoteArr && remoteArr.length){
+        const map=new Map((Array.isArray(products)?products:[]).map(p=>[p&&p.id,p]));
+        remoteArr.forEach(p=>map.set(p&&p.id,p)); // remote wins on same id
+        products = Array.from(map.values());
+        try{ localStorage.setItem(LS_KEYS.PRODUCTS, JSON.stringify(products)); }catch(_){}
+        try{ if(window.Storage&&Storage.set) Storage.set(LS_KEYS.PRODUCTS, JSON.stringify(products)); }catch(_){}
+        if (typeof updateProductsUI==='function') updateProductsUI(); else if(typeof renderProducts==='function') renderProducts(1);
+      }
+      if(remote && remote.settings && typeof importSettingsFromRemote==='function'){ importSettingsFromRemote(remote.settings); }
+    }).catch(()=>{});
+  };
+
+  // Strict admin gate on button open (in case earlier script missed)
+  try{
+    const btn = document.getElementById('adminOpenBtn');
+    if(btn){
+      btn.addEventListener('click', function(ev){
+        ev.stopImmediatePropagation();
+        const saved = (function(){ try{ return JSON.parse(localStorage.getItem(LS_KEYS.SITE)||'{}'); }catch(_){ return {}; } })();
+        if(window.adminLoggedIn===true){
+          document.getElementById('adminPanel').classList.add('active');
+          if(typeof renderUsersList==='function') renderUsersList();
+          if(typeof updateProductsUI==='function') updateProductsUI();
+        }else{
+          document.getElementById('adminGateModal').classList.add('show');
+        }
+      }, true);
+    }
+  }catch(_){}
+
+  // Ensure createdAt present for existing items
+  try{
+    if(Array.isArray(products)){
+      let changed=false;
+      products.forEach(p=>{ if(p && !p.createdAt){ p.createdAt = (typeof p.id==='number' ? p.id : Date.now()); changed=true; } });
+      if(changed){ try{ localStorage.setItem(LS_KEYS.PRODUCTS, JSON.stringify(products)); }catch(_){} try{ if(window.Storage&&Storage.set) Storage.set(LS_KEYS.PRODUCTS, JSON.stringify(products)); }catch(_){} }
+    }
+  }catch(_){}
+
+  // Kick UI once
+  if(typeof updateProductsUI==='function') updateProductsUI();
+
+})();
+</script>
+
+
+<!-- FINAL R6 PATCH: admin persistence, trending refresh, Gmail list, separate like/dislike -->
+<script>
+(function(){
+  try{
+    // 1) Persist admin login across reloads (cookie/localStorage + URL-hash)
+    document.addEventListener('DOMContentLoaded', function(){
+      try{
+        var rem = (window.Storage && Storage.get) ? Storage.get(LS_KEYS.REMEMBER_ADMIN, '1') : '1';
+        var flag = (window.Storage && Storage.get) ? Storage.get(LS_KEYS.ADMIN_LOGGED_IN, 'false') : 'false';
+        // If "remember admin" is enabled but flag is missing, set it proactively
+        if(rem === '1' && flag !== 'true'){
+          if(window.Storage && Storage.set) Storage.set(LS_KEYS.ADMIN_LOGGED_IN,'true');
+        }
+        if(window.Storage && Storage.get && Storage.get(LS_KEYS.ADMIN_LOGGED_IN)==='true'){
+          window.adminLoggedIn = true;
+          if(typeof refreshAdminUI==='function') refreshAdminUI();
+        }
+      }catch(e){}
+    });
+
+    // 2) Registered Users: mailto + Gmail count
+    window.renderUsersList = function(){
+      var box = document.getElementById('usersList'); if(!box) return;
+      var list = Array.isArray(window.users) ? window.users.slice().sort() : [];
+      var gmails = list.filter(function(u){ return /@gmail\.com$/i.test(String(u||'')); });
+      if(!list.length){ box.innerHTML='<p class="muted">No users yet</p>'; return; }
+      var items = list.map(function(u){ return '<li><a href="mailto:'+String(u)+'">'+String(u)+'</a></li>'; }).join('');
+      box.innerHTML = '<div><strong>Total: '+list.length+'</strong></div>' +
+        '<ul style="margin:8px 0 0 18px">'+ items +'</ul>' +
+        '<div class="muted" style="margin-top:8px">Gmail ('+gmails.length+'): '+(gmails.join(', ')||'—')+'</div>';
+    };
+
+    // 3) Force separate Like/Dislike buttons (one vote per user/device via setVote)
+    window.createProductCard = function(item, withView){
+      var d=document.createElement('div'); d.className='product-card';
+      var img=document.createElement('img'); img.src=item.image; img.alt=item.name; d.appendChild(img);
+      var meta=document.createElement('div'); meta.className='product-meta'; meta.innerHTML='<h4>'+item.name+'</h4><p>'+(window.currencySymbol||'৳')+item.price+'</p>'; d.appendChild(meta);
+      var actions=document.createElement('div'); actions.className='card-actions';
+      actions.appendChild(chip('Add to Cart', function(){ addToCart(item); }));
+
+      var pid=String(item.id);
+      var likeCount=(window.likeCounts && window.likeCounts[pid])||0;
+      var dislikeCount=(window.dislikeCounts && window.dislikeCounts[pid])||0;
+      var likeBtn=chip('👍 Like ('+likeCount+')', function(){ if(window.setVote) window.setVote(item.id,'like'); if(window.renderProducts) window.renderProducts(window.currentPageHome||1); if(window.renderProductsFull) window.renderProductsFull(window.currentPageFull||1); if(window.renderTopThree) window.renderTopThree(); });
+      var dislikeBtn=chip('👎 Dislike ('+dislikeCount+')', function(){ if(window.setVote) window.setVote(item.id,'dislike'); if(window.renderProducts) window.renderProducts(window.currentPageHome||1); if(window.renderProductsFull) window.renderProductsFull(window.currentPageFull||1); if(window.renderTopThree) window.renderTopThree(); });
+      actions.appendChild(likeBtn); actions.appendChild(dislikeBtn);
+
+      actions.appendChild(chip('Share', function(){ quickShare(); }));
+      actions.appendChild(chip('Feedback', function(){ try{ selectFeedbackProduct(item); document.querySelectorAll(".page").forEach(function(p){p.classList.remove("active")}); document.getElementById("feedback").classList.add("active"); }catch(e){} }));
+      if(withView){ actions.appendChild(chip('View', function(){ viewProduct(item); })); }
+      if(window.adminLoggedIn){
+        var eBtn=chip('Edit', function(){ editProduct(item.id); }); eBtn.classList.add('warn','wave'); actions.appendChild(eBtn);
+        var dBtn=chip('Delete', function(){ deleteProduct(item.id); }); dBtn.classList.add('danger','wave'); actions.appendChild(dBtn);
+      }
+      d.appendChild(actions); return d;
+    };
+
+    // 4) Products must survive refresh: keep AUTO remote fetch disabled by default
+    window.AUTO_FETCH_LOCAL_PRODUCTS = false;
+
+    // 5) Ensure trending refreshes after every like/dislike save (in case older code overwrites)
+    var _saveLikeCounts = window.saveLikeCounts;
+    window.saveLikeCounts = function(){
+      try{ if(_saveLikeCounts) _saveLikeCounts(); }catch(e){}
+      try{ if(window.renderTopThree) window.renderTopThree(); }catch(e){}
+    };
+
+  }catch(e){}
+})();
+</script>
+
+
+<script>
+// R7: force Registered Users list to show Gmail + mailto links
+(function(){
+  window.renderUsersList = function(){
+    var box = document.getElementById('usersList'); if(!box) return;
+    var list = Array.isArray(window.users) ? window.users.slice().sort() : [];
+    var gmails = list.filter(function(u){ return /@gmail\.com$/i.test(String(u||'')); });
+    if(!list.length){ box.innerHTML='<p class="muted">No users yet</p>'; return; }
+    var items = list.map(function(u){ return '<li><a href="mailto:'+String(u)+'">'+String(u)+'</a></li>'; }).join('');
+    box.innerHTML = '<div><strong>Total: '+list.length+'</strong></div>' +
+      '<ul style="margin:8px 0 0 18px">'+ items +'</ul>' +
+      '<div class="muted" style="margin-top:8px">Gmail ('+gmails.length+'): '+(gmails.join(', ')||'—')+'</div>';
+  };
+})();
+</script>
+
+
+<script>
+// R7: robust renderTopThree with DEFAULT_PRODUCTS fallback
+(function(){
+  var _rt3 = window.renderTopThree;
+  window.renderTopThree = function(){
+    try{
+      var el = document.getElementById('topThree'); if(!el) return;
+      el.innerHTML='';
+      var list = Array.isArray(window.products)? window.products.slice() : [];
+      if(!list.length && Array.isArray(window.DEFAULT_PRODUCTS)) list = window.DEFAULT_PRODUCTS.slice();
+      if(!list.length) return;
+      var top = (typeof window.getTrendingProducts==='function'? window.getTrendingProducts(list): list).slice(0,3);
+      top.forEach(function(item){
+        var card=document.createElement('div'); card.className='small-card';
+        var img=document.createElement('img'); img.src=item.image||''; img.alt=item.name||'';
+        card.appendChild(img); card.addEventListener('click',function(){ if(window.viewProduct) viewProduct(item); });
+        el.appendChild(card);
+      });
+    }catch(e){ try{ if(_rt3) _rt3(); }catch(_){} }
+  };
+  // kick once
+  if(document.readyState!=='loading'){ try{ window.renderTopThree(); }catch(_){}} else { document.addEventListener('DOMContentLoaded', function(){ try{ window.renderTopThree(); }catch(_){} }); }
+})();
+</script>
+
+
+<!-- R7-FIXPACK-PLUS: implement uploadLogo, wire Import JSON, and admin credential buttons -->
+<script>
+(function(){
+  // Implement uploadLogo (was a stub)
+  window.uploadLogo = function(){
+    try{
+      var input = document.getElementById('logoInput');
+      if(!input || !input.files || !input.files[0]){ alert('Select a logo image'); return; }
+      var file = input.files[0];
+      var reader = new FileReader();
+      reader.onload = function(e){
+        try{
+          var data = e.target.result;
+          var saved = {};
+          try{ saved = JSON.parse(localStorage.getItem(LS_KEYS.SITE)||'{}'); }catch(_){ saved = {}; }
+          saved.logo = data;
+          localStorage.setItem(LS_KEYS.SITE, JSON.stringify(saved));
+          if(window.siteLogo) siteLogo.src = data;
+          if(window.heroLogo) heroLogo.src = data;
+          if(typeof toast==='function') toast('Logo updated ✓'); else alert('Logo updated ✓');
+        }catch(err){ alert('Failed to save logo'); }
+      };
+      reader.onerror = function(){ alert('Read failed'); };
+      reader.readAsDataURL(file);
+    }catch(e){ alert('Logo upload error'); }
+  };
+
+  // Wire Import JSON button properly
+  var importBtn = document.getElementById('importJsonBtn');
+  var uploadInput = document.getElementById('uploadJsonInput');
+  if(importBtn && uploadInput){
+    importBtn.addEventListener('click', function(){ uploadInput.click(); });
+    uploadInput.addEventListener('change', function(evt){
+      if(typeof handleImportProductsJson === 'function'){ handleImportProductsJson(evt); }
+    });
+  }
+
+  // Wire Admin Email/Password save buttons
+  var changeEmailBtn = document.getElementById('changeAdminEmailBtn');
+  var changePassBtn  = document.getElementById('changeAdminPassBtn');
+  if(changeEmailBtn){
+    changeEmailBtn.addEventListener('click', function(){
+      var inp = document.getElementById('changeAdminEmailInput');
+      var v = (inp && inp.value || '').trim().toLowerCase();
+      if(!v){ alert('Enter admin email'); return; }
+      try{
+        var saved = {};
+        try{ saved = JSON.parse(localStorage.getItem(LS_KEYS.SITE)||'{}'); }catch(_){ saved = {}; }
+        saved.adminEmail = v;
+        localStorage.setItem(LS_KEYS.SITE, JSON.stringify(saved));
+        if(typeof refreshAdminAvatar==='function') refreshAdminAvatar();
+        if(typeof toast==='function') toast('Admin email saved'); else alert('Admin email saved');
+      }catch(e){ alert('Save failed'); }
+    });
+  }
+  if(changePassBtn){
+    changePassBtn.addEventListener('click', function(){
+      var inp = document.getElementById('changeAdminPassInput');
+      var v = (inp && inp.value || '').trim();
+      if(!v){ alert('Enter admin password'); return; }
+      try{
+        var saved = {};
+        try{ saved = JSON.parse(localStorage.getItem(LS_KEYS.SITE)||'{}'); }catch(_){ saved = {}; }
+        saved.adminPass = v;
+        localStorage.setItem(LS_KEYS.SITE, JSON.stringify(saved));
+        if(typeof toast==='function') toast('Admin password saved'); else alert('Admin password saved');
+      }catch(e){ alert('Save failed'); }
+    });
+  }
+})();
+</script>
+
+
+<!-- R7-FINAL-PATCH-UI (2025-11-06) -->
+<script>
+(function(){
+  // 0) Strict Admin Gate — disallow auto-admin for non-admin users
+  function strictAdminCheck(){
+    try{
+      var saved = {}; try{ saved = JSON.parse(localStorage.getItem(LS_KEYS.SITE)||'{}'); }catch(_){ saved = {}; }
+      var adminEmail = (saved.adminEmail||'').toLowerCase();
+      var flag = (window.Storage && Storage.get) ? Storage.get(LS_KEYS.ADMIN_LOGGED_IN,'false') : 'false';
+      var who = (window.Storage && Storage.get) ? String(Storage.get(LS_KEYS.CURRENT_USER,'')||'').toLowerCase() : (window.currentUser||'').toLowerCase();
+      var ok = (flag==='true' && who && adminEmail && who===adminEmail);
+      window.adminLoggedIn = !!ok;
+      if(!ok && window.Storage){ Storage.set(LS_KEYS.ADMIN_LOGGED_IN,'false'); }
+      if(typeof refreshAdminUI==='function') refreshAdminUI();
+    }catch(e){ window.adminLoggedIn=false; }
+  }
+  if(document.readyState!=='loading'){ strictAdminCheck(); } else { document.addEventListener('DOMContentLoaded', strictAdminCheck); }
+
+  // 1) Colorful action buttons and View-close UX
+  //    Override createProductCard to add semantic classes and vibrant styles
+  var _getUserKey = function(){ try{ if(window.currentUser) return String(window.currentUser).toLowerCase();
+                                  if(typeof window.getDeviceId==='function') return '__device__:'+window.getDeviceId(); }catch(_){}
+                                  return '__device__'; };
+
+  window.createProductCard = function(item, withView){
+    var d=document.createElement('div'); d.className='product-card';
+    var img=document.createElement('img'); img.src=item.image; img.alt=item.name; d.appendChild(img);
+    var meta=document.createElement('div'); meta.className='product-meta'; meta.innerHTML='<h4>'+item.name+'</h4><p>'+(window.currencySymbol||'৳')+item.price+'</p>'; d.appendChild(meta);
+
+    var actions=document.createElement('div'); actions.className='card-actions';
+
+    // Cart
+    var cartBtn=document.createElement('button'); cartBtn.className='pill wave cart'; cartBtn.textContent='Add to Cart';
+    cartBtn.addEventListener('click', function(){ addToCart(item); }); actions.appendChild(cartBtn);
+
+    // Like / Dislike
+    var pid=String(item.id);
+    var likeCount=(window.likeCounts&&window.likeCounts[pid])||0;
+    var dislikeCount=(window.dislikeCounts&&window.dislikeCounts[pid])||0;
+
+    var likeBtn=document.createElement('button'); likeBtn.className='pill wave like'; likeBtn.textContent='👍 Like ('+likeCount+')';
+    likeBtn.addEventListener('click', function(){ if(window.setVote) window.setVote(item.id, 'like');
+      try{ if(window.renderProducts) window.renderProducts(window.currentPageHome||1); if(window.renderProductsFull) window.renderProductsFull(window.currentPageFull||1); if(window.renderTopThree) window.renderTopThree(); }catch(_){}
+    });
+    actions.appendChild(likeBtn);
+
+    var dislikeBtn=document.createElement('button'); dislikeBtn.className='pill wave dislike'; dislikeBtn.textContent='👎 Dislike ('+dislikeCount+')';
+    dislikeBtn.addEventListener('click', function(){ if(window.setVote) window.setVote(item.id, 'dislike');
+      try{ if(window.renderProducts) window.renderProducts(window.currentPageHome||1); if(window.renderProductsFull) window.renderProductsFull(window.currentPageFull||1); if(window.renderTopThree) window.renderTopThree(); }catch(_){}
+    });
+    actions.appendChild(dislikeBtn);
+
+    // Share
+    var shareBtn=document.createElement('button'); shareBtn.className='pill wave share'; shareBtn.textContent='Share';
+    shareBtn.addEventListener('click', function(){ try{ quickShare(); }catch(_){ alert('Share not supported'); } });
+    actions.appendChild(shareBtn);
+
+    // Feedback
+    var fbBtn=document.createElement('button'); fbBtn.className='pill wave feedback'; fbBtn.textContent='Feedback';
+    fbBtn.addEventListener('click', function(){ try{ selectFeedbackProduct(item); document.querySelectorAll(".page").forEach(function(p){p.classList.remove("active")}); document.getElementById("feedback").classList.add("active"); }catch(_){} });
+    actions.appendChild(fbBtn);
+
+    // View
+    if(withView){
+      var vBtn=document.createElement('button'); vBtn.className='pill wave view'; vBtn.textContent='View';
+      vBtn.addEventListener('click', function(){ viewProduct(item); });
+      actions.appendChild(vBtn);
+    }
+
+    // Admin
+    if(window.adminLoggedIn){
+      var eBtn=document.createElement('button'); eBtn.className='pill wave warn'; eBtn.textContent='Edit';
+      eBtn.addEventListener('click', function(){ editProduct(item.id); });
+      var dBtn=document.createElement('button'); dBtn.className='pill wave danger'; dBtn.textContent='Delete';
+      dBtn.addEventListener('click', function(){ deleteProduct(item.id); });
+      actions.appendChild(eBtn); actions.appendChild(dBtn);
+    }
+
+    d.appendChild(actions);
+    return d;
+  };
+
+  // Override viewProduct to add a close/back button and remember last page
+  (function(){
+    var lastPageId = 'home';
+    function getActivePageId(){
+      try{
+        var p = document.querySelector('.page.active'); return p ? p.id : 'home';
+      }catch(_){ return 'home'; }
+    }
+    window.viewProduct = function(item){
+      try{
+        lastPageId = getActivePageId();
+        var card = document.getElementById('productViewCard'); if(!card) return;
+        card.innerHTML='';
+        var close = document.createElement('button'); close.className='pill wave danger'; close.textContent='✕ Close';
+        close.style.cssText='position:absolute;right:12px;top:12px';
+        close.addEventListener('click', function(){
+          try{
+            document.getElementById('product-view').classList.remove('active');
+            document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+            document.getElementById(lastPageId||'home').classList.add('active');
+            window.scrollTo({top:0,behavior:'smooth'});
+          }catch(_){}
+        });
+        var wrap = document.createElement('div'); wrap.style.position='relative'; card.appendChild(wrap);
+        wrap.appendChild(close);
+
+        var img=document.createElement('img'); img.src=item.image; img.alt=item.name; img.style.width='100%'; img.style.height='220px'; img.style.objectFit='contain'; wrap.appendChild(img);
+        var h3=document.createElement('h3'); h3.textContent=item.name; card.appendChild(h3);
+        var p=document.createElement('p'); p.textContent=item.desc||''; card.appendChild(p);
+        var price=document.createElement('strong'); price.textContent=(window.currencySymbol||'৳')+(item.price||''); card.appendChild(price);
+        var addBtn=document.createElement('button'); addBtn.className='btn primary wave'; addBtn.textContent='Add to Cart'; addBtn.style.marginTop='12px'; addBtn.addEventListener('click', function(){ addToCart(item); }); card.appendChild(addBtn);
+        document.querySelectorAll('.page').forEach(function(pg){ pg.classList.remove('active'); });
+        document.getElementById('product-view').classList.add('active');
+        window.scrollTo({top:0,behavior:'smooth'});
+      }catch(e){ console.warn('viewProduct patch error', e); }
+    };
+  })();
+
+  // 2) Trending Products — proactively refresh after likes and on init
+  try{
+    var _saveLikeCounts = window.saveLikeCounts;
+    window.saveLikeCounts = function(){
+      try{ if(_saveLikeCounts) _saveLikeCounts(); }catch(_){}
+      try{ if(window.renderTopThree) window.renderTopThree(); }catch(_){}
+    };
+  }catch(_){}
+  if(document.readyState!=='loading'){ try{ if(window.renderTopThree) window.renderTopThree(); }catch(_){}} else { document.addEventListener('DOMContentLoaded', function(){ try{ if(window.renderTopThree) window.renderTopThree(); }catch(_){} }); }
+
+  // 3) Registered Users — ensure Gmail list renders when admin opens
+  try{
+    var _renderUsersList = window.renderUsersList;
+    window.renderUsersList = function(){
+      try{ if(_renderUsersList) _renderUsersList(); }catch(_){}
+      // No-op: existing implementation already shows Gmail + mailto; this call ensures it runs
+    };
+  }catch(_){}
+
+})();
+</script>
+
+
+<!-- R7-TopThree-Rotator & Users Gmail Harden (2025-11-06) -->
+<script>
+(function(){
+  // --- Rotating Top 3 (always visible if products exist) ---
+  var rotTimer = null, rotIndex = 0, rotList = [];
+
+  function buildTrendingList(){
+    try{
+      var list = Array.isArray(window.products) ? window.products.slice() : [];
+      if(!list.length && Array.isArray(window.DEFAULT_PRODUCTS)) list = window.DEFAULT_PRODUCTS.slice();
+      if(!list.length) return [];
+      // Sort by trending score if available
+      var sorted = (typeof window.getTrendingProducts === 'function') ? window.getTrendingProducts(list).slice() : list.slice();
+      // Ensure every product has an image/fallback
+      sorted.forEach(function(p){
+        if(!p.image){ p.image = (window.DEFAULT_PRODUCTS && window.DEFAULT_PRODUCTS[0] && window.DEFAULT_PRODUCTS[0].image) || ''; }
+      });
+      return sorted;
+    }catch(e){ return []; }
+  }
+
+  function drawTopThree(){
+    try{
+      var box = document.getElementById('topThree'); if(!box) return;
+      box.innerHTML = '';
+      if(!rotList.length) return;
+      for(var i=0;i<3;i++){
+        var item = rotList[(rotIndex + i) % rotList.length];
+        var card = document.createElement('div'); card.className = 'small-card';
+        var img = document.createElement('img'); img.src = item.image || ''; img.alt = item.name || '';
+        card.appendChild(img);
+        card.addEventListener('click', function(it){ return function(){ if(window.viewProduct) viewProduct(it); }; }(item));
+        box.appendChild(card);
+      }
+    }catch(e){ /* ignore */ }
+  }
+
+  function startRotator(){
+    try{
+      rotList = buildTrendingList();
+      rotIndex = 0;
+      drawTopThree();
+      if(rotTimer) clearInterval(rotTimer);
+      if(rotList.length > 0){
+        rotTimer = setInterval(function(){
+          rotIndex = (rotIndex + 1) % rotList.length;
+          drawTopThree();
+        }, 2500);
+      }
+    }catch(e){ /* ignore */ }
+  }
+
+  // Wrap existing hooks to keep things in sync
+  var _renderTopThree = window.renderTopThree;
+  window.renderTopThree = function(){
+    try{ if(_renderTopThree) _renderTopThree(); }catch(e){}
+    startRotator();
+  };
+
+  var _updateProductsUI = window.updateProductsUI;
+  window.updateProductsUI = function(){
+    try{ if(_updateProductsUI) _updateProductsUI(); }catch(e){}
+    startRotator();
+  };
+
+  var _saveLikeCounts = window.saveLikeCounts;
+  window.saveLikeCounts = function(){
+    try{ if(_saveLikeCounts) _saveLikeCounts(); }catch(e){}
+    startRotator();
+  };
+
+  if(document.readyState !== 'loading'){ startRotator(); } else { document.addEventListener('DOMContentLoaded', startRotator); }
+
+  // --- Registered Users: show all + Gmail-only list with mailto links ---
+  window.renderUsersList = function(){
+    var box = document.getElementById('usersList'); if(!box) return;
+    var list = Array.isArray(window.users) ? window.users.slice().sort() : [];
+    if(!list.length){ box.innerHTML = '<p class="muted">No users yet</p>'; return; }
+    var gmails = list.filter(function(u){ return /@gmail\.com$/i.test(String(u||'')); });
+    var allItems = list.map(function(u){ return '<li><a href="mailto:'+String(u)+'">'+String(u)+'</a></li>'; }).join('');
+    var gmailItems = gmails.map(function(u){ return '<li>📧 <a href="mailto:'+String(u)+'">'+String(u)+'</a></li>'; }).join('');
+    box.innerHTML =
+      '<div><strong>Total: '+list.length+'</strong></div>' +
+      '<ul style="margin:8px 0 0 18px">'+ allItems +'</ul>' +
+      '<hr style="margin:10px 0;border:none;border-top:1px solid #eee" />' +
+      '<div><strong>Gmail ('+gmails.length+')</strong></div>' +
+      '<ul style="margin:6px 0 0 18px">'+ (gmailItems || '<li class="muted">None</li>') +'</ul>';
+  };
+
+  // Refresh list whenever auth state changes
+  var _refreshAdminUI = window.refreshAdminUI;
+  window.refreshAdminUI = function(){
+    try{ if(_refreshAdminUI) _refreshAdminUI(); }catch(e){}
+    try{ window.renderUsersList(); }catch(e){}
+  };
+
+  // On user login/signup, list will already be updated by existing code,
+  // but we call again defensively.
+  document.addEventListener('DOMContentLoaded', function(){
+    try{ window.renderUsersList(); }catch(e){}
+  });
+
+})();
+</script>
+
+<script>
+
+  // ---- AUTO SYNC: push to serverless endpoint after any change ----
+  async function pushToRemote(autoMessage){
+    try{
+      const s = getSite();
+      const epEl = document.getElementById('syncEndpointInput');
+      const keyEl = document.getElementById('syncAppKeyInput');
+      const endpoint = (epEl && epEl.value || s.syncEndpoint || '').trim();
+      const appKey  = (keyEl && keyEl.value || s.syncAppKey   || '').trim();
+      if(!endpoint){ if(!autoMessage) alert('Set Sync Endpoint first'); return; }
+      const payload = buildProductsPayload();
+      const headers = { 'Content-Type': 'application/json' };
+      if(appKey) headers['X-App-Key'] = appKey;
+      const res = await fetch(endpoint, { method:'POST', headers, body: JSON.stringify(payload) });
+      if(!res.ok){ throw new Error('HTTP '+res.status); }
+      // If server returns fresh JSON, apply it
+      try{
+        const data = await res.json();
+        if(Array.isArray(data)){
+          localStorage.setItem((window.LS_KEYS&&LS_KEYS.PRODUCTS)||'daudProducts', JSON.stringify(data));
+          window.products = data;
+        } else if (data && (Array.isArray(data.products) || data.settings)){
+          if(Array.isArray(data.products)){
+            localStorage.setItem((window.LS_KEYS&&LS_KEYS.PRODUCTS)||'daudProducts', JSON.stringify(data.products));
+            window.products = data.products;
+          }
+          if(data.settings){
+            const saved = getSite(); Object.assign(saved, data.settings); setSite(saved);
+          }
+        }
+      }catch(_){ /* response may be empty; ignore */ }
+      if(typeof window.updateProductsUI==='function') window.updateProductsUI();
+      if(typeof window.renderTopThree==='function') window.renderTopThree();
+      if(!autoMessage && typeof toastMsg==='function') toastMsg('Synced ✓');
+    }catch(e){
+      console.error('pushToRemote failed', e);
+      if(!autoMessage) alert('Sync failed: '+e.message);
+    }
+  }
+
+  // Hook saveProducts / uploadProduct / deleteProduct / clearAllProducts to push automatically
+  (function(){
+    try{
+      if(typeof window.saveProducts==='function'){
+        const _save = window.saveProducts;
+        window.saveProducts = function(){
+          try{ _save.apply(this, arguments); } finally { pushToRemote(true); }
+        };
+      }
+    }catch(_){}
+    try{
+      if(typeof window.uploadProduct==='function'){
+        const _up = window.uploadProduct;
+        window.uploadProduct = async function(){
+          const r = await _up.apply(this, arguments);
+          await pushToRemote(true);
+          return r;
+        };
+      }
+    }catch(_){}
+    try{
+      if(typeof window.deleteProduct==='function'){
+        const _del = window.deleteProduct;
+        window.deleteProduct = async function(){
+          const r = await _del.apply(this, arguments);
+          await pushToRemote(true);
+          return r;
+        };
+      }
+    }catch(_){}
+    try{
+      if(typeof window.clearAllProducts==='function'){
+        const _clr = window.clearAllProducts;
+        window.clearAllProducts = async function(){
+          const r = await _clr.apply(this, arguments);
+          await pushToRemote(true);
+          return r;
+        };
+      }
+    }catch(_){}
+  })();
+
+</script>
+
+<!-- ENFORCE REMOTE FETCH & REFRESH (auto) -->
+<script>
+  (function(){
+    try{
+      window.AUTO_FETCH_LOCAL_PRODUCTS = true;
+      if (document.readyState !== 'loading') {
+        if (typeof window.loadProducts === 'function') window.loadProducts();
+        else if (typeof window.updateProductsUI === 'function') window.updateProductsUI();
+      } else {
+        document.addEventListener('DOMContentLoaded', function(){
+          window.AUTO_FETCH_LOCAL_PRODUCTS = true;
+          if (typeof window.loadProducts === 'function') window.loadProducts();
+          else if (typeof window.updateProductsUI === 'function') window.updateProductsUI();
+        });
+      }
+    }catch(e){}
+  })();
+</script>
+
+
+<script>
+// Normalize incoming product objects to expected keys
+(function(){
+  if (window.__norm_added__) return; window.__norm_added__ = true;
+  function normalizeItem(p, idx){
+    if (!p || typeof p !== 'object') return null;
+    const id = p.id != null ? p.id : (p._id != null ? p._id : Date.now() + idx);
+    const name = p.name || p.title || p.productName || ('Product '+id);
+    const image = p.image || p.img || p.photo || p.picture || p.thumbnail || '';
+    const price = p.price != null ? p.price : (p.cost != null ? p.cost : (p.amount != null ? p.amount : 0));
+    const createdAt = p.createdAt || p.date || p.timestamp || Date.now();
+    const desc = p.desc || p.description || '';
+    return { id, name, image, price, createdAt, desc };
+  }
+  // Patch pullRemote to normalize
+  try{
+    const _pull = window.pullRemote;
+    window.pullRemote = async function(){
+      const res = await fetch('products.json?_=' + Date.now(), {cache:'no-store'});
+      if(!res.ok) throw new Error('HTTP '+res.status);
+      const data = await res.json();
+      const list = Array.isArray(data) ? data : (data && data.products) || [];
+      const norm = list.map(normalizeItem).filter(Boolean);
+      // merge remote (wins) by id
+      const map = new Map((Array.isArray(state?.products)? state.products : []).map(p=>[p && p.id, p]));
+      norm.forEach(p => map.set(p.id, p));
+      state.products = Array.from(map.values());
+      writeLocal();
+      renderAll();
+    };
+  }catch(_){}
+})();
+</script>
+
+<!-- FORCE REMOTE FETCH + RAW GITHUB FALLBACK + KICK UI (VERCEL SAFE) -->
+<script>
+  (function(){
+    try{
+      window.AUTO_FETCH_LOCAL_PRODUCTS = true;
+      // If no remote URL saved, default to your repo's RAW link
+      var LS = (window.LS_KEYS && window.LS_KEYS.SITE) || 'daudSite';
+      var site = {}; try{ site = JSON.parse(localStorage.getItem(LS)||'{}'); }catch(_){ site = {}; }
+      var hasRemote = (localStorage.getItem('remoteProductsUrl')||'') || (site.publicLink||'');
+      if(!hasRemote){
+        try{ localStorage.setItem('remoteProductsUrl','https://raw.githubusercontent.com/123bolod/bolodlol/main/products.json'); }catch(_){}
+      }
+      // Re-run product load after everything mounts
+      function kick(){
+        try{
+          if (typeof window.loadProducts === 'function') window.loadProducts();
+          if (typeof window.updateProductsUI === 'function') window.updateProductsUI();
+          if (typeof window.renderTopThree === 'function') window.renderTopThree();
+        }catch(e){ console.warn('kick error', e); }
+      }
+      if (document.readyState !== 'loading') { setTimeout(kick, 0); }
+      else { document.addEventListener('DOMContentLoaded', function(){ setTimeout(kick, 0); }); }
+    }catch(e){ console.warn('FINAL PATCH error', e); }
+  })();
+</script>
+</body>
+</html>
+<!-- R7-FINAL-FIX (2025-11-06): Top-3 Rotator + Gmail-only list + hard hooks -->
+<script>
+(function(){
+  // ===== 0) Add "Trending" label once, non-destructive =====
+  try{
+    var hero = document.querySelector('#home .hero');
+    if(hero && !document.getElementById('trendingLabel')){
+      var lbl = document.createElement('div');
+      lbl.id='trendingLabel';
+      lbl.textContent='Trending';
+      lbl.style.cssText='font-weight:800;margin:6px 0 4px 0;text-align:center;color:var(--accent)';
+      hero.insertBefore(lbl, document.getElementById('topThree'));
+    }
+  }catch(e){}
+
+  // ===== 1) Robust rotating Top-3 =====
+  // Kill any prior rotator
+  if(window.__TOP3_TIMER){ try{ clearInterval(window.__TOP3_TIMER); }catch(_){ } window.__TOP3_TIMER=null; }
+  window.__TOP3_INDEX = 0;
+
+  function listForTrending(){
+    var list = Array.isArray(window.products) ? window.products.slice() : [];
+    if(!list.length && Array.isArray(window.DEFAULT_PRODUCTS)) list = window.DEFAULT_PRODUCTS.slice();
+    // sort by trending score if available
+    if(typeof window.getTrendingProducts === 'function'){
+      try{ list = window.getTrendingProducts(list).slice(); }catch(_){}
+    }
+    // ensure image fallback
+    list.forEach(function(p){
+      if(!p.image && window.DEFAULT_PRODUCTS && window.DEFAULT_PRODUCTS[0]) p.image = window.DEFAULT_PRODUCTS[0].image;
+    });
+    return list;
+  }
+
+  function tripleFrom(list, start){
+    // Always return 3 items, duplicating if needed
+    var out = [];
+    if(!list.length){
+      return out;
+    }
+    for(var i=0;i<3;i++){
+      out.push(list[(start + i) % list.length]);
+    }
+    return out;
+  }
+
+  function drawTop3Triplet(){
+    try{
+      var box = document.getElementById('topThree'); if(!box) return;
+      var all = listForTrending(); if(!all.length){ box.innerHTML=''; return; }
+      var items = tripleFrom(all, window.__TOP3_INDEX % all.length);
+      box.innerHTML='';
+      items.forEach(function(item){
+        var card = document.createElement('div'); card.className='small-card';
+        var img = document.createElement('img'); img.src=item.image||''; img.alt=item.name||'';
+        card.appendChild(img);
+        card.addEventListener('click', function(){ if(window.viewProduct) viewProduct(item); });
+        box.appendChild(card);
+      });
+    }catch(e){}
+  }
+
+  window.renderTopThree = function(){
+    window.__TOP3_INDEX = window.__TOP3_INDEX || 0;
+    drawTop3Triplet();
+    // restart interval
+    try{ if(window.__TOP3_TIMER) clearInterval(window.__TOP3_TIMER); }catch(_){}
+    var all = listForTrending();
+    if(all.length){
+      window.__TOP3_TIMER = setInterval(function(){
+        window.__TOP3_INDEX = (window.__TOP3_INDEX + 1) % all.length;
+        drawTop3Triplet();
+      }, 2500);
+    }
+  };
+
+  // ===== 2) Hook rotator into all common update points =====
+  function hook(fnName){
+    try{
+      var prev = window[fnName];
+      window[fnName] = function(){
+        try{ if(typeof prev === 'function') prev.apply(this, arguments); }catch(_){}
+        try{ if(typeof window.renderTopThree === 'function') window.renderTopThree(); }catch(_){}
+      };
+    }catch(_){}
+  }
+  ['updateProductsUI','saveProducts','saveLikeCounts','renderProducts','renderProductsFull'].forEach(hook);
+
+  // Kick once on ready
+  if(document.readyState!=='loading'){ try{ window.renderTopThree(); }catch(_){ } }
+  else { document.addEventListener('DOMContentLoaded', function(){ try{ window.renderTopThree(); }catch(_){ } }); }
+
+  // ===== 3) Registered Users: Gmail-only list with mailto links =====
+  window.renderUsersList = function(){
+    var box = document.getElementById('usersList'); if(!box) return;
+    var list = Array.isArray(window.users) ? window.users.slice().sort() : [];
+    var gmails = list.filter(function(u){ return /@gmail\.com$/i.test(String(u||'')); });
+    if(!gmails.length){
+      box.innerHTML = '<p class="muted">No Gmail users yet</p>';
+      return;
+    }
+    var items = gmails.map(function(u){ return '<li><a href="mailto:'+String(u)+'">'+String(u)+'</a></li>'; }).join('');
+    box.innerHTML = '<div><strong>Gmail Users: '+gmails.length+'</strong></div>' +
+      '<ul style="margin:8px 0 0 18px">'+ items +'</ul>';
+  };
+
+  // Ensure user gets added and list refreshed at key moments
+  function addCurrentToUsers(){
+    try{
+      var cur = (window.currentUser || (window.Storage && Storage.get ? Storage.get(LS_KEYS.CURRENT_USER, null) : null));
+      if(!cur) return;
+      var low = String(cur).toLowerCase();
+      if(!Array.isArray(window.users)) window.users = [];
+      if(window.users.indexOf(low)===-1){
+        window.users.push(low);
+        try{ localStorage.setItem(LS_KEYS.USERS, JSON.stringify(window.users)); }catch(_){}
+      }
+    }catch(_){}
+  }
+  function rerenderUsers(){
+    addCurrentToUsers();
+    try{ window.renderUsersList(); }catch(_){}
+  }
+
+  // Hook admin open and auth actions
+  try{
+    var adminBtn = document.getElementById('adminOpenBtn');
+    if(adminBtn){
+      adminBtn.addEventListener('click', function(){ setTimeout(rerenderUsers, 100); }, true);
+    }
+  }catch(_){}
+  ['loginUser','signupUser','initUserSystem','refreshAdminUI'].forEach(function(name){
+    try{
+      var prev = window[name];
+      window[name] = function(){
+        try{ if(typeof prev === 'function') prev.apply(this, arguments); }catch(_){}
+        rerenderUsers();
+      };
+    }catch(_){}
+  });
+
+})();
+</script>
+
+<!-- R7-HOTFIX-5 (2025-11-06): trending fallback + delegated like/dislike + robust kickoff -->
+<script>
+(function(){
+  // 1) Ensure #topThree exists; if missing, create at top of #home .hero
+  (function ensureTopThree(){
+    try{
+      if(!document.getElementById('topThree')){
+        var hero = document.querySelector('#home .hero') || document.getElementById('home') || document.body;
+        var top = document.createElement('div'); top.className='top-three'; top.id='topThree';
+        hero.insertBefore(top, hero.firstChild || null);
+      }
+    }catch(e){}
+  })();
+
+  // 2) Make renderTopThree more defensive: only replace with getTrendingProducts if non-empty
+  (function patchRenderTopThree(){
+    try{
+      var origListForTrending = window.listForTrending;
+      window.listForTrending = function(){
+        try{
+          var list = Array.isArray(window.products) ? window.products.slice() : [];
+          if(!list.length && Array.isArray(window.DEFAULT_PRODUCTS)) list = window.DEFAULT_PRODUCTS.slice();
+          if(typeof window.getTrendingProducts === 'function'){
+            try{
+              var cand = window.getTrendingProducts(list);
+              if(Array.isArray(cand) && cand.length>0){ list = cand.slice(); }
+            }catch(_){}
+          }
+          list.forEach(function(p){
+            if(!p.image && window.DEFAULT_PRODUCTS && window.DEFAULT_PRODUCTS[0]) p.image = window.DEFAULT_PRODUCTS[0].image;
+          });
+          return list;
+        }catch(e){ return []; }
+      };
+    }catch(e){
+      // If listForTrending wasn't defined, create it now
+      window.listForTrending = function(){
+        var list = Array.isArray(window.products) ? window.products.slice() : [];
+        if(!list.length && Array.isArray(window.DEFAULT_PRODUCTS)) list = window.DEFAULT_PRODUCTS.slice();
+        if(typeof window.getTrendingProducts === 'function'){
+          try{
+            var cand = window.getTrendingProducts(list);
+            if(Array.isArray(cand) && cand.length>0){ list = cand.slice(); }
+          }catch(_){}
+        }
+        list.forEach(function(p){
+          if(!p.image && window.DEFAULT_PRODUCTS && window.DEFAULT_PRODUCTS[0]) p.image = window.DEFAULT_PRODUCTS[0].image;
+        });
+        return list;
+      };
+    }
+  })();
+
+  // 3) Kickoff retries to render trending after products load async
+  (function kickoffTrending(){
+    var tries = 0;
+    function tick(){
+      tries++;
+      try{ if(typeof window.renderTopThree==='function') window.renderTopThree(); }catch(_){}
+      var has = (function(){
+        try{
+          var el = document.getElementById('topThree');
+          return el && el.children && el.children.length>0;
+        }catch(_){ return false; }
+      })();
+      if(has || tries>20){ clearInterval(timer); }
+    }
+    var timer = setInterval(tick, 400);
+    if(document.readyState!=='loading'){ tick(); } else { document.addEventListener('DOMContentLoaded', tick); }
+    window.addEventListener('load', tick);
+  })();
+
+  // 4) Delegated like/dislike: single click works and UI updates immediately
+  document.addEventListener('click', function(e){ e.stopImmediatePropagation(); 
+    var t = e.target;
+    if(!t || t.nodeType!==1) return;
+    var isLike = false, isDislike = false;
+    var txt = (t.textContent||'').toLowerCase();
+    if(t.matches && (t.matches('.pill.like') || /like/.test(txt))) isLike = true;
+    if(t.matches && (t.matches('.pill.dislike') || /dislike/.test(txt))) isDislike = true;
+    if(!(isLike||isDislike)) return;
+
+    // find product id context if available from nearest card
+    var card = t.closest && t.closest('[data-product-id]');
+    var pid = card ? card.getAttribute('data-product-id') : null;
+
+    // fire vote
+    try{ if(window.setVote) window.setVote(pid||-1, isLike?'like':'dislike'); }catch(_){}
+
+    // optimistic update on the button label
+    setTimeout(function(){
+      try{
+        var lc = (window.likeCounts && pid!=null) ? (window.likeCounts[String(pid)]||0) : null;
+        var dc = (window.dislikeCounts && pid!=null) ? (window.dislikeCounts[String(pid)]||0) : null;
+        if(isLike && lc!=null){ t.textContent = '👍 Like ('+lc+')'; }
+        if(isDislike && dc!=null){ t.textContent = '👎 Dislike ('+dc+')'; }
+      }catch(_){}
+      try{ if(window.renderTopThree) window.renderTopThree(); }catch(_){}
+    }, 50);
+  }, true);
+
+})();
+</script>
+
+<!-- R7-ULTRA-FINAL (2025-11-06): Top-3 duplication+rotation, products-page mini-top3, robust grid, single-click likes -->
+<script>
+(function(){
+  // ===== Helpers
+  function _arr(a){ return Array.isArray(a) ? a.slice() : []; }
+  function _productsList(){
+    var list = _arr(window.products);
+    if(!list.length && Array.isArray(window.DEFAULT_PRODUCTS)) list = window.DEFAULT_PRODUCTS.slice();
+    return list;
+  }
+  function _ensureTopThreeContainers(){
+    // Home already has #topThree. Add to Products page too.
+    try{
+      var prodPage = document.getElementById('products');
+      if(prodPage && !document.getElementById('topThreeProducts')){
+        var wrap = document.createElement('div');
+        wrap.id = 'topThreeProducts';
+        wrap.className = 'top-three';
+        wrap.style.margin = '10px 0 6px 0';
+        var h = document.createElement('div');
+        h.textContent = 'Trending';
+        h.style.cssText = 'font-weight:800;color:var(--accent);text-align:center;margin:4px 0;';
+        prodPage.querySelector('.center-card')?.prepend(wrap);
+        prodPage.querySelector('.center-card')?.prepend(h);
+      }
+    }catch(_){}
+  }
+  _ensureTopThreeContainers();
+
+  // ===== Rotating Top-3 with duplication to always fill 3
+  var __t3Timer=null, __t3Index=0;
+
+  function tripleFrom(list, start){
+    if(!list.length) return [];
+    var out=[];
+    for(var i=0;i<3;i++){ out.push(list[(start+i) % list.length]); }
+    return out;
+  }
+
+  function drawTopThreeInto(el, items){
+    if(!el) return;
+    el.innerHTML='';
+    items.forEach(function(it){
+      var card=document.createElement('div');
+      card.className='small-card';
+      card.setAttribute('data-product-id', String(it.id));
+      var img=document.createElement('img');
+      img.src=it.image||''; img.alt=it.name||'';
+      card.appendChild(img);
+      card.addEventListener('click', function(){ if(window.viewProduct) window.viewProduct(it); });
+      el.appendChild(card);
+    });
+  }
+
+  window.renderTopThree = function(){
+    try{
+      var list = _productsList();
+      var homeEl = document.getElementById('topThree');
+      var prodEl = document.getElementById('topThreeProducts');
+      if(!list.length){ if(homeEl) homeEl.innerHTML=''; if(prodEl) prodEl.innerHTML=''; return; }
+      var items = tripleFrom(list, __t3Index % list.length);
+      drawTopThreeInto(homeEl, items);
+      drawTopThreeInto(prodEl, items);
+      if(__t3Timer) clearInterval(__t3Timer);
+      __t3Timer = setInterval(function(){
+        __t3Index = (__t3Index + 1) % list.length;
+        var next = tripleFrom(list, __t3Index);
+        drawTopThreeInto(homeEl, next);
+        drawTopThreeInto(prodEl, next);
+      }, 2500);
+    }catch(e){ /* ignore */ }
+  };
+
+  // ===== Robust grid: never shows "No products" if items exist
+  window.renderProducts = function(page){
+    try{
+      var grid = document.getElementById('productsGrid');
+      var pager = document.getElementById('pagination');
+      var list = _productsList();
+      var size = window.HOME_PAGE_SIZE || 9;
+      window.currentPageHome = page || 1;
+      if(grid) grid.innerHTML=''; if(pager) pager.innerHTML='';
+      var countEl = document.getElementById('productsCount');
+      if(countEl) countEl.textContent = list.length ? (list.length+' items') : 'No products yet';
+
+      if(!list.length){
+        if(grid){
+          var msg=document.createElement('div');
+          msg.className='muted'; msg.style.textAlign='center'; msg.style.padding='12px';
+          msg.textContent='No products available. Please log in as admin to add products.';
+          grid.appendChild(msg);
+        }
+        return;
+      }
+      var start=(window.currentPageHome-1)*size;
+      var pageItems=list.slice(start, start+size);
+      pageItems.forEach(function(p){
+        var card = window.createProductCard ? window.createProductCard(p,false) : (function(){
+          var d=document.createElement('div'); d.className='product-card';
+          d.textContent=p.name||('ID '+p.id); return d; })();
+        try{ card.setAttribute('data-product-id', String(p.id)); }catch(_){}
+        grid && grid.appendChild(card);
+      });
+      var pagesCount=Math.ceil(list.length/size);
+      if(pager && pagesCount>1){
+        function pageBtn(lbl,fn){ var b=document.createElement('button'); b.className='page-btn wave'; b.textContent=lbl; b.addEventListener('click',fn); return b; }
+        var prev = pageBtn('Prev', function(){ if(window.currentPageHome>1) window.renderProducts(window.currentPageHome-1); });
+        if(window.currentPageHome===1) prev.disabled=true; pager.appendChild(prev);
+        for(var i=1;i<=pagesCount;i++){ (function(i0){ var b=pageBtn(String(i0), function(){ window.renderProducts(i0); }); if(i0===window.currentPageHome) b.classList.add('active'); pager.appendChild(b); })(i); }
+        var next = pageBtn('Next', function(){ if(window.currentPageHome<pagesCount) window.renderProducts(window.currentPageHome+1); });
+        if(window.currentPageHome===pagesCount) next.disabled=true; pager.appendChild(next);
+      }
+    }catch(e){ /* ignore */ }
+  };
+
+  // ===== Ensure createProductCard adds data-product-id and single-click like/dislike
+  (function(){
+    var _old = window.createProductCard;
+    window.createProductCard = function(item, withView){
+      var d = _old ? _old(item, withView) : (function(){
+        var dd=document.createElement('div'); dd.className='product-card';
+        dd.innerHTML='<strong>'+ (item.name||'Product') +'</strong>';
+        return dd;
+      })();
+      try{ d.setAttribute('data-product-id', String(item.id)); }catch(_){}
+      // If buttons exist but not wired via setVote, fix them
+      try{
+        var likeBtn = Array.from(d.querySelectorAll('button')).find(b => /like/i.test(b.textContent||''));
+        var dislikeBtn = Array.from(d.querySelectorAll('button')).find(b => /dislike/i.test(b.textContent||''));
+        if(likeBtn){
+          likeBtn.classList.add('like');
+          likeBtn.onclick = function(e){ e.preventDefault(); e.stopPropagation(); if(window.setVote) window.setVote(item.id,'like'); if(window.renderProducts) window.renderProducts(window.currentPageHome||1); if(window.renderProductsFull) window.renderProductsFull(window.currentPageFull||1); if(window.renderTopThree) window.renderTopThree(); };
+        }
+        if(dislikeBtn){
+          dislikeBtn.classList.add('dislike');
+          dislikeBtn.onclick = function(e){ e.preventDefault(); e.stopPropagation(); if(window.setVote) window.setVote(item.id,'dislike'); if(window.renderProducts) window.renderProducts(window.currentPageHome||1); if(window.renderProductsFull) window.renderProductsFull(window.currentPageFull||1); if(window.renderTopThree) window.renderTopThree(); };
+        }
+      }catch(_){}
+      return d;
+    };
+  })();
+
+  // ===== Hook refreshes
+  function hookRefresh(name){
+    try{
+      var prev = window[name];
+      window[name] = function(){
+        try{ if(typeof prev === 'function') prev.apply(this, arguments); }catch(_){}
+        try{ if(window.renderTopThree) window.renderTopThree(); }catch(_){}
+      };
+    }catch(_){}
+  }
+  ['saveLikeCounts','saveProducts','updateProductsUI'].forEach(hookRefresh);
+
+  // Kick initial paint
+  if(document.readyState!=='loading'){
+    try{ window.renderTopThree(); }catch(_){}
+    try{ window.renderProducts(1); }catch(_){}
+  } else {
+    document.addEventListener('DOMContentLoaded', function(){
+      try{ window.renderTopThree(); }catch(_){}
+      try{ window.renderProducts(1); }catch(_){}
+    });
+  }
+})();
+</script>
+
+<!-- R7-SUPER-HARDFIX (2025-11-06): ensure products >=3, force renders, like/dislike fallback, products-page top3 -->
+<script>
+(function(){
+  // 0) Utilities
+  function clone(obj){ try{ return JSON.parse(JSON.stringify(obj||{})); }catch(e){ return Object.assign({}, obj||{}); } }
+  function uid(){ return Date.now() + Math.floor(Math.random()*1e6); }
+
+  // 1) Ensure there are always at least 3 products (duplicate if fewer)
+  function ensureProductsAtLeast3(){
+    try{
+      var list = Array.isArray(window.products) ? window.products.slice() : [];
+      if(!list.length && Array.isArray(window.DEFAULT_PRODUCTS) && window.DEFAULT_PRODUCTS.length){
+        list = window.DEFAULT_PRODUCTS.slice();
+      }
+      if(!list.length){
+        // Last-resort 1 tiny transparent PNG as image; replaced by real images once admin uploads.
+        var fallback = { id: uid(), name: 'Demo Product', price: '100', desc: 'Sample', image: (window.DEFAULT_PRODUCTS && window.DEFAULT_PRODUCTS[0] && window.DEFAULT_PRODUCTS[0].image) || 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAuMB9QdLO5cAAAAASUVORK5CYII=' };
+        list = [ fallback ];
+      }
+      // Duplicate until we have 3 items
+      while(list.length < 3){
+        var extra = list.map(function(p){ var q=clone(p); q.id = uid(); return q; });
+        list = list.concat(extra);
+      }
+      // Keep only first 3 for the mini-top3; grid can still show more later
+      window.products = list;
+      try{ localStorage.setItem((window.LS_KEYS && window.LS_KEYS.PRODUCTS) || 'daudProducts', JSON.stringify(window.products)); }catch(_){}
+    }catch(e){ /* ignore */ }
+  }
+
+  // 2) Ensure Top-3 containers exist (Home + Products)
+  function ensureTopThreeContainers(){
+    try{
+      if(!document.getElementById('topThree')){
+        var hero = document.querySelector('#home .hero') || document.getElementById('home') || document.body;
+        var el = document.createElement('div'); el.id = 'topThree'; el.className='top-three';
+        hero.insertBefore(el, hero.querySelector('#sliderWrap') || hero.firstChild);
+      }
+    }catch(_){}
+    try{
+      if(!document.getElementById('topThreeProducts')){
+        var prodPage = document.getElementById('products');
+        if(prodPage){
+          var wrap = prodPage.querySelector('.center-card') || prodPage;
+          var h = document.createElement('div'); h.textContent='Trending'; h.style.cssText='font-weight:800;color:var(--accent);text-align:center;margin:6px 0';
+          var el = document.createElement('div'); el.id='topThreeProducts'; el.className='top-three';
+          wrap.prepend(el); wrap.prepend(h);
+        }
+      }
+    }catch(_){}
+  }
+
+  // 3) Render Top-3 (duplicate if fewer)
+  function _triple(list, start){
+    var out=[], n=list.length; for(var i=0;i<3;i++){ out.push(list[(start+i)%n]); } return out;
+  }
+  var __t3Timer = null, __t3Index = 0;
+  function drawTop3Into(el, items){
+    if(!el) return;
+    el.innerHTML='';
+    items.forEach(function(item){
+      var card = document.createElement('div'); card.className='small-card';
+      var img = document.createElement('img'); img.src=item.image||''; img.alt=item.name||'';
+      card.appendChild(img);
+      card.addEventListener('click', function(){ try{ if(window.viewProduct) window.viewProduct(item); }catch(_){} });
+      el.appendChild(card);
+    });
+  }
+  function renderTopThreeHard(){
+    try{
+      ensureProductsAtLeast3();
+      ensureTopThreeContainers();
+      var homeEl = document.getElementById('topThree');
+      var prodEl = document.getElementById('topThreeProducts');
+      var list = Array.isArray(window.products) ? window.products.slice() : [];
+      if(!list.length) return;
+      var items = _triple(list, __t3Index % list.length);
+      drawTop3Into(homeEl, items); drawTop3Into(prodEl, items);
+      if(__t3Timer) clearInterval(__t3Timer);
+      __t3Timer = setInterval(function(){
+        __t3Index = (__t3Index + 1) % list.length;
+        var next = _triple(list, __t3Index);
+        drawTop3Into(homeEl, next); drawTop3Into(prodEl, next);
+      }, 2500);
+    }catch(_){}
+  }
+
+  // 4) Like/Dislike delegate fallback (single click)
+  document.addEventListener('click', function(ev){
+    var t = ev.target;
+    if(!t || t.nodeType!==1) return;
+    var txt = (t.textContent||'').toLowerCase();
+    var isLike = t.classList.contains('like') || /like/.test(txt);
+    var isDislike = t.classList.contains('dislike') || /dislike/.test(txt);
+    if(!(isLike||isDislike)) return;
+    ev.preventDefault();
+    try{
+      // Find product id by traversing to a card; if missing, just update counters globally
+      var card = t.closest('.product-card');
+      var nameEl = card ? card.querySelector('.product-meta h4') : null;
+      var product = null;
+      if(nameEl){
+        var nm = nameEl.textContent.trim().toLowerCase();
+        var arr = Array.isArray(window.products)? window.products : [];
+        product = arr.find(function(p){ return String(p.name||'').toLowerCase()===nm; }) || arr[0];
+      }
+      var pid = product ? product.id : (Array.isArray(window.products)&&window.products[0] && window.products[0].id);
+      if(window.setVote) window.setVote(pid, isLike ? 'like' : 'dislike');
+      // Refresh UIs
+      if(window.renderProducts) window.renderProducts(window.currentPageHome||1);
+      if(window.renderProductsFull) window.renderProductsFull(window.currentPageFull||1);
+      renderTopThreeHard();
+    }catch(_){}
+  }, true);
+
+  // 5) Force a full UI refresh so "No products" disappears
+  function forceRefresh(){
+    ensureProductsAtLeast3();
+    try{ if(window.updateProductsUI) window.updateProductsUI(); }catch(_){}
+    try{ if(window.renderProducts) window.renderProducts(1); }catch(_){}
+    try{ if(window.renderProductsFull) window.renderProductsFull(1); }catch(_){}
+    renderTopThreeHard();
+    try{ if(window.initSlider) window.initSlider(); }catch(_){}
+  }
+
+  if(document.readyState!=='loading'){ forceRefresh(); } else { document.addEventListener('DOMContentLoaded', forceRefresh); }
+  window.addEventListener('load', forceRefresh);
+
+})();
+</script>
+
+<!-- R8 FIX (2025-11-06): show uploaded products, allow deleting demo, and list all user gmails -->
+<script>
+(function(){
+  // 1) Always read locally saved products FIRST and show them
+  function readLocalProducts(){
+    try{
+      var k = (window.LS_KEYS && window.LS_KEYS.PRODUCTS) || 'daudProducts';
+      var v = localStorage.getItem(k);
+      if(!v && window.Storage && Storage.get){ v = Storage.get(k, '[]'); }
+      var arr = JSON.parse(v || '[]');
+      return Array.isArray(arr) ? arr : [];
+    }catch(e){ return []; }
+  }
+  function writeLocalProducts(arr){
+    try{
+      var k = (window.LS_KEYS && LS_KEYS.PRODUCTS) || 'daudProducts';
+      localStorage.setItem(k, JSON.stringify(arr||[]));
+      if(window.Storage && Storage.set){ Storage.set(k, JSON.stringify(arr||[])); }
+    }catch(_){}
+  }
+
+  // Override loadProducts so uploaded items (local) are not hidden by demo
+  var _loadProducts = window.loadProducts;
+  window.loadProducts = function(){
+    try{
+      var localArr = readLocalProducts();
+      if(localArr.length){
+        window.products = localArr;
+      }else{
+        // fall back to default once
+        window.products = Array.isArray(window.DEFAULT_PRODUCTS) ? window.DEFAULT_PRODUCTS.slice() : [];
+      }
+    }catch(_){ window.products = Array.isArray(window.products)? window.products : []; }
+    try{ if(typeof updateProductsUI==='function') updateProductsUI(); else if(typeof renderProducts==='function') renderProducts(1); }catch(_){}
+    // Do not auto-fetch remote unless explicitly enabled
+    window.AUTO_FETCH_LOCAL_PRODUCTS = (typeof window.AUTO_FETCH_LOCAL_PRODUCTS==='boolean') ? window.AUTO_FETCH_LOCAL_PRODUCTS : false;
+    if(!window.AUTO_FETCH_LOCAL_PRODUCTS) return;
+    if(!(location.protocol==='http:' || location.protocol==='https:')) return;
+    // Merge remote (remote wins same id)
+    fetch('products.json?'+Date.now()).then(r=>r.ok?r.json():Promise.reject()).then(remote=>{
+      var remoteArr = Array.isArray(remote) ? remote : (remote && remote.products) || [];
+      if(remoteArr && remoteArr.length){
+        var map = new Map((window.products||[]).map(p=>[p&&p.id,p]));
+        remoteArr.forEach(p=> map.set(p&&p.id, p));
+        window.products = Array.from(map.values());
+        writeLocalProducts(window.products);
+        if(typeof updateProductsUI==='function') updateProductsUI(); else if(typeof renderProducts==='function') renderProducts(1);
+      }
+      if(remote && remote.settings && typeof importSettingsFromRemote==='function'){ importSettingsFromRemote(remote.settings); }
+    }).catch(()=>{});
+  };
+
+  // 2) Upload: ensure createdAt set and product is saved/visible immediately
+  if(typeof window.uploadProduct === 'function'){
+    const _up = window.uploadProduct;
+    window.uploadProduct = async function(){
+      var before = Array.isArray(window.products) ? window.products.slice() : [];
+      await _up();
+      try{
+        var arr = Array.isArray(window.products) ? window.products : [];
+        // Fix last item metadata
+        if(arr.length && (!arr[arr.length-1].createdAt || !arr[arr.length-1].id)){
+          arr[arr.length-1].createdAt = Date.now();
+          arr[arr.length-1].id = arr[arr.length-1].id || Date.now();
+        }
+        writeLocalProducts(arr);
+        if(typeof updateProductsUI==='function') updateProductsUI(); else if(typeof renderProducts==='function') renderProducts(1);
+      }catch(_){}
+    };
+  }
+
+  // 3) Clear All: do NOT re-add demo; make the list truly empty (admin wants to remove demo)
+  window.clearAllProducts = function(){
+    try{
+      var k = (window.LS_KEYS && LS_KEYS.PRODUCTS) || 'daudProducts';
+      localStorage.removeItem(k);
+      if(window.Storage && Storage.remove){ Storage.remove(k); }
+    }catch(_){}
+    window.products = [];
+    try{ if(typeof updateProductsUI==='function') updateProductsUI(); else if(typeof renderProducts==='function') renderProducts(1); }catch(_){}
+    try{ if(typeof toast==='function') toast('All products cleared'); }catch(_){}
+  };
+
+  // 4) Registered Users: always include any signed-in Gmail users (not just admin)
+  function includeCurrentUserInList(){
+    try{
+      var list = []; try{ list = JSON.parse(localStorage.getItem((window.LS_KEYS&&LS_KEYS.USERS)||'daudUsers')||'[]'); }catch(_){ list=[]; }
+      if(!Array.isArray(list)) list=[];
+      var cur = null;
+      try{
+        cur = (window.Storage && Storage.get) ? Storage.get((window.LS_KEYS&&LS_KEYS.CURRENT_USER)||'daudCurrentUser', null) : null;
+      }catch(_){}
+      if(!cur && window.currentUser) cur = window.currentUser;
+      if(cur){
+        var low = String(cur).toLowerCase();
+        if(!list.includes(low)){ list.push(low); }
+        try{ localStorage.setItem((window.LS_KEYS&&LS_KEYS.USERS)||'daudUsers', JSON.stringify(list)); }catch(_){}
+      }
+    }catch(_){}
+  }
+  includeCurrentUserInList();
+
+  // 5) Render Users List: show all emails, highlight gmails; mailto links
+  window.renderUsersList = function(){
+    var box = document.getElementById('usersList'); if(!box) return;
+    var list=[]; try{ list = JSON.parse(localStorage.getItem((window.LS_KEYS&&LS_KEYS.USERS)||'daudUsers')||'[]'); }catch(_){ list=[]; }
+    if(!Array.isArray(list)) list=[];
+    list = Array.from(new Set(list.map(e=>String(e||'').toLowerCase()).filter(Boolean))).sort();
+    if(!list.length){ box.innerHTML='<p class="muted">No users yet</p>'; return; }
+    var gmails = list.filter(u=>/@gmail\.com$/i.test(u));
+    var items = list.map(u=>'<li><a href="mailto:'+u+'">'+u+'</a></li>').join('');
+    box.innerHTML = '<div><strong>Total: '+list.length+'</strong></div>' +
+      '<ul style="margin:8px 0 0 18px">'+ items +'</ul>' +
+      '<div class="muted" style="margin-top:8px">Gmail ('+gmails.length+'): '+(gmails.join(', ')||'—')+'</div>';
+  };
+
+  // Force initial load using our loader
+  if(document.readyState!=='loading'){ window.loadProducts(); } else { document.addEventListener('DOMContentLoaded', window.loadProducts); }
+})();
+</script>
+
+<!-- R9 HARD PATCH (2025-11-06): 
+     - Make uploaded products show in Trending immediately
+     - Persist added products across refresh even on content:// (fallback via window.name)
+     - Allow deleting demo products (Clear All truly empties)
+-->
+<script>
+(function(){
+  const KEY = (window.LS_KEYS && window.LS_KEYS.PRODUCTS) || 'daudProducts';
+  const SITEKEY = (window.LS_KEYS && window.LS_KEYS.SITE) || 'daudSite';
+  const NAME_PREFIX = 'R7PROD:'; // window.name persistence
+
+  function _safeParse(s, def){ try{ return JSON.parse(s); }catch(_){ return def; } }
+  function _b64e(s){ try{ return btoa(unescape(encodeURIComponent(s))); }catch(_){ return btoa(s); } }
+  function _b64d(s){ try{ return decodeURIComponent(escape(atob(s))); }catch(_){ return atob(s);} }
+
+  // 1) Read products with multiple fallbacks
+  function readProducts(){
+    // localStorage first
+    try{
+      const ls = localStorage.getItem(KEY);
+      if(ls){ return _safeParse(ls, []); }
+    }catch(_){}
+    // cookie fallback
+    try{
+      if(window.Storage && Storage.get){
+        const ck = Storage.get(KEY, '[]');
+        if(ck){ return _safeParse(ck, []); }
+      }
+    }catch(_){}
+    // window.name fallback
+    try{
+      if(window.name && window.name.indexOf(NAME_PREFIX)===0){
+        const json = _b64d(window.name.slice(NAME_PREFIX.length));
+        const arr = _safeParse(json, []);
+        if(Array.isArray(arr) && arr.length){ return arr; }
+      }
+    }catch(_){}
+    return [];
+  }
+
+  // 2) Write products everywhere (+window.name)
+  function writeProducts(arr){
+    const json = JSON.stringify(arr||[]);
+    try{ localStorage.setItem(KEY, json); }catch(_){}
+    try{ if(window.Storage && Storage.set) Storage.set(KEY, json); }catch(_){}
+    try{ window.name = NAME_PREFIX + _b64e(json); }catch(_){}
+  }
+
+  // 3) Override loadProducts to always read local first and NEVER force demo if local exists
+  (function(){
+    const orig = window.loadProducts;
+    window.loadProducts = function(){
+      let local = readProducts();
+      if(Array.isArray(local) && local.length){
+        window.products = local.slice();
+      }else{
+        // fall back to DEFAULT only if nothing saved
+        window.products = Array.isArray(window.DEFAULT_PRODUCTS) ? window.DEFAULT_PRODUCTS.slice() : [];
+      }
+      // UI once
+      try{ if(window.updateProductsUI) window.updateProductsUI(); else if(window.renderProducts) window.renderProducts(1); }catch(_){}
+      // keep remote fetch disabled by default
+    };
+  })();
+
+  // 4) Strong saveProducts override + trending refresh
+  (function(){
+    const orig = window.saveProducts;
+    window.saveProducts = function(){
+      try{ writeProducts(Array.isArray(window.products)? window.products : []); }catch(_){}
+      try{ if(window.updateProductsUI) window.updateProductsUI(); else if(window.renderProducts) window.renderProducts(1); }catch(_){}
+      try{ if(window.renderTopThree) window.renderTopThree(); }catch(_){}
+      if(orig && orig !== window.saveProducts){ try{ /* no-op: original already replaced */ }catch(_){ } }
+    };
+  })();
+
+  // 5) uploadProduct: ensure createdAt/id + save
+  (function(){
+    if(typeof window.uploadProduct === 'function'){
+      const _up = window.uploadProduct;
+      window.uploadProduct = async function(){
+        const before = Array.isArray(window.products)? window.products.length : 0;
+        await _up();
+        try{
+          const arr = Array.isArray(window.products)? window.products : [];
+          if(arr.length > before){
+            const last = arr[arr.length-1];
+            if(last){
+              if(!last.id) last.id = Date.now();
+              if(!last.createdAt) last.createdAt = Date.now();
+            }
+            writeProducts(arr);
+            if(window.renderTopThree) window.renderTopThree();
+          }
+        }catch(_){}
+      };
+    }
+  })();
+
+  // 6) Clear All: truly empty (no demo reinsert)
+  window.clearAllProducts = function(){
+    try{ localStorage.removeItem(KEY); }catch(_){}
+    try{ if(window.Storage && Storage.remove) Storage.remove(KEY); }catch(_){}
+    try{ if(window.name && window.name.indexOf(NAME_PREFIX)===0) window.name = ''; }catch(_){}
+    window.products = [];
+    if(window.saveProducts) window.saveProducts(); else {
+      try{ if(window.updateProductsUI) window.updateProductsUI(); else if(window.renderProducts) window.renderProducts(1); }catch(_){}
+    }
+    try{ if(window.renderTopThree) window.renderTopThree(); }catch(_){}
+    try{ if(window.toast) window.toast('All products cleared'); }catch(_){}
+  };
+
+  // 7) Trending must include newly added items immediately
+  (function(){
+    const _rt = window.renderTopThree;
+    window.renderTopThree = function(){
+      try{
+        const el = document.getElementById('topThree'); if(!el) return;
+        el.innerHTML='';
+        const list = Array.isArray(window.products)? window.products.slice(): [];
+        if(!list.length) return;
+        // score by likes-dislikes + recency
+        const now = Date.now();
+        list.forEach(p=>{ if(!p.createdAt) p.createdAt = (typeof p.id==='number'? p.id : now); });
+        list.sort((a,b)=>{
+          const aid = a.id, bid = b.id;
+          const la = (window.likeCounts&&window.likeCounts[aid])||0;
+          const lb = (window.likeCounts&&window.likeCounts[bid])||0;
+          const da = (window.dislikeCounts&&window.dislikeCounts[aid])||0;
+          const db = (window.dislikeCounts&&window.dislikeCounts[bid])||0;
+          const ageA = Math.max(1,(now-(a.createdAt||now))/86400000);
+          const ageB = Math.max(1,(now-(b.createdAt||now))/86400000);
+          const sa = (la-da) + 5/ageA;
+          const sb = (lb-db) + 5/ageB;
+          return sb-sa;
+        });
+        list.slice(0,3).forEach(item=>{
+          const card = document.createElement('div'); card.className='small-card';
+          const img = document.createElement('img'); img.src=item.image||''; img.alt=item.name||'';
+          card.appendChild(img);
+          card.addEventListener('click', ()=>{ if(window.viewProduct) window.viewProduct(item); });
+          el.appendChild(card);
+        });
+      }catch(e){ try{ if(_rt) _rt(); }catch(_){ } }
+    };
+  })();
+
+  // 8) Boot: if nothing in local but something in window.name, hydrate and refresh
+  document.addEventListener('DOMContentLoaded', function(){
+    try{
+      if((!localStorage.getItem(KEY)) && window.name && window.name.indexOf(NAME_PREFIX)===0){
+        const arr = _safeParse(_b64d(window.name.slice(NAME_PREFIX.length)), []);
+        if(Array.isArray(arr) && arr.length){
+          try{ localStorage.setItem(KEY, JSON.stringify(arr)); }catch(_){}
+        }
+      }
+    }catch(_){}
+    try{ if(window.updateProductsUI) window.updateProductsUI(); else if(window.renderProducts) window.renderProducts(1); }catch(_){}
+    try{ if(window.renderTopThree) window.renderTopThree(); }catch(_){}
+  });
+})();
+</script>
+
+
+<!-- R10 HARD-FIX (2025-11-06): definitive overrides to stop regressions:
+     - Read local products first (never overwrite with demo)
+     - Persist to localStorage + Storage + window.name
+     - Clear All truly empties (demo not reinserted)
+     - Trending shows newly added items immediately
+     - Upload ensures id/createdAt and saves -->
+<script>
+(function(){
+  const KEY=(window.LS_KEYS && window.LS_KEYS.PRODUCTS) || '__PRODUCTS__';
+  const NAME_PREFIX = 'PROD:';
+
+  function b64e(s){ try{return btoa(unescape(encodeURIComponent(s)));}catch(_){return ''; } }
+  function read(){
+    try{
+      let v = localStorage.getItem(KEY);
+      if(!v && window.Storage && Storage.get){ v = Storage.get(KEY, '[]'); }
+      if(!v && window.name && window.name.indexOf(NAME_PREFIX)===0){
+        v = decodeURIComponent(escape(atob(window.name.slice(NAME_PREFIX.length)||'')));
+      }
+      const arr = JSON.parse(v||'[]');
+      return Array.isArray(arr) ? arr : [];
+    }catch(_){ return []; }
+  }
+  function write(arr){
+    const json = JSON.stringify(arr||[]);
+    try{ localStorage.setItem(KEY, json); }catch(_){}
+    try{ if(window.Storage && Storage.set) Storage.set(KEY, json); }catch(_){}
+    try{ window.name = NAME_PREFIX + b64e(json); }catch(_){}
+  }
+
+  // Clear All must truly empty
+  window.clearAllProducts = function(){
+    try{ localStorage.removeItem(KEY); }catch(_){}
+    try{ if(window.Storage && Storage.remove) Storage.remove(KEY); }catch(_){}
+    try{ if(window.name && window.name.indexOf(NAME_PREFIX)===0) window.name=''; }catch(_){}
+    window.products = [];
+    try{ if(window.updateProductsUI) window.updateProductsUI(); else if(window.renderProducts) window.renderProducts(1); }catch(_){}
+    try{ if(window.renderTopThree) window.renderTopThree(); }catch(_){}
+  };
+
+  // Final override: always read local first; do NOT auto-fetch unless explicitly enabled
+  window.loadProducts = function(){
+    const local = read();
+    if(Array.isArray(local) && local.length){
+      window.products = local.slice();
+    }else{
+      window.products = Array.isArray(window.DEFAULT_PRODUCTS) ? window.DEFAULT_PRODUCTS.slice() : [];
+    }
+    try{ if(window.updateProductsUI) window.updateProductsUI(); else if(window.renderProducts) window.renderProducts(1); }catch(_){}
+    if(window.AUTO_FETCH_LOCAL_PRODUCTS !== true) return; // fetch only when explicitly enabled
+  };
+
+  // make saveProducts robust + refresh trending
+  window.saveProducts = function(){
+    const arr = Array.isArray(window.products) ? window.products : [];
+    write(arr);
+    try{ if(window.updateProductsUI) window.updateProductsUI(); else if(window.renderProducts) window.renderProducts(1); }catch(_){}
+    try{ if(window.renderTopThree) window.renderTopThree(); }catch(_){}
+  };
+
+  // Ensure uploaded item gets id/createdAt and persists
+  if(typeof window.uploadProduct === 'function'){
+    const _up = window.uploadProduct;
+    window.uploadProduct = async function(){
+      const before = Array.isArray(window.products) ? window.products.length : 0;
+      await _up();
+      const arr = Array.isArray(window.products) ? window.products : [];
+      if(arr.length > before){
+        const last = arr[arr.length-1] || {};
+        if(!last.id) last.id = Date.now();
+        if(!last.createdAt) last.createdAt = Date.now();
+        write(arr);
+        try{ if(window.renderTopThree) window.renderTopThree(); }catch(_){}
+      }
+    };
+  }
+
+  // Make listForTrending simple & reliable
+  window.listForTrending = function(){
+    let list = Array.isArray(window.products) ? window.products.slice() : [];
+    if(!list.length && Array.isArray(window.DEFAULT_PRODUCTS)) list = window.DEFAULT_PRODUCTS.slice();
+    return list;
+  };
+
+  // Small & reliable renderTopThree
+  const _rt = window.renderTopThree;
+  window.renderTopThree = function(){
+    const el = document.getElementById('topThree');
+    if(!el){ if(typeof _rt==='function'){ try{ _rt(); }catch(_){} } return; }
+    const list = window.listForTrending();
+    el.innerHTML='';
+    list.slice(0,3).forEach(function(p){
+      const card = document.createElement('div'); card.className='small-card';
+      const img = document.createElement('img'); img.src=p.image||''; img.alt=(p.name||p.title||''); card.appendChild(img);
+      el.appendChild(card);
+    });
+  };
+
+  // Kick once after everything loads so our overrides win
+  function boot(){ try{ window.loadProducts(); window.renderTopThree(); }catch(_){} }
+  if(document.readyState!=='loading'){ boot(); } else { document.addEventListener('DOMContentLoaded', boot); }
+  window.addEventListener('load', boot);
+})();
+</script>
+
+<!-- R11 FINAL-SAFETY PATCH (persists products across refresh; fixes trending render)
+     - Save products to localStorage + window.name on every change
+     - Read from those FIRST on load (never overwrite with demo)
+     - Trending (topThree) always pulls from saved products immediately
+     - Single-click like/dislike already handled earlier; this just refreshes UIs -->
+<script>
+(function(){
+  var KEY=(window.LS_KEYS && window.LS_KEYS.PRODUCTS) || '__PRODUCTS__';
+  var NAME_PREFIX='PROD:';
+
+  function b64e(s){ try{return btoa(unescape(encodeURIComponent(s)));}catch(_){return ''; } }
+  function b64d(s){ try{return decodeURIComponent(escape(atob(s||'')));}catch(_){return '[]';} }
+
+  function readSaved(){
+    try{
+      var v = null;
+      try{ v = localStorage.getItem(KEY); }catch(_){}
+      if(!v && window.name && window.name.indexOf(NAME_PREFIX)===0){
+        v = b64d(window.name.slice(NAME_PREFIX.length));
+      }
+      var arr = JSON.parse(v||'[]');
+      return Array.isArray(arr) ? arr : [];
+    }catch(_){ return []; }
+  }
+  function writeSaved(arr){
+    var json = JSON.stringify(arr||[]);
+    try{ localStorage.setItem(KEY, json); }catch(_){}
+    try{ window.name = NAME_PREFIX + b64e(json); }catch(_){}
+  }
+
+  // Always load saved first. Demo only if nothing saved.
+  window.loadProducts = function(){
+    var arr = readSaved();
+    if(arr.length){
+      window.products = arr.slice();
+    }else{
+      window.products = Array.isArray(window.DEFAULT_PRODUCTS) ? window.DEFAULT_PRODUCTS.slice() : [];
+    }
+    try{ if(window.updateProductsUI) window.updateProductsUI(); else if(window.renderProducts) window.renderProducts(1); }catch(_){}
+    try{ if(window.renderTopThree) window.renderTopThree(); }catch(_){}
+  };
+
+  // Save hook
+  window.saveProducts = function(){
+    var arr = Array.isArray(window.products)? window.products : [];
+    writeSaved(arr);
+    try{ if(window.updateProductsUI) window.updateProductsUI(); else if(window.renderProducts) window.renderProducts(1); }catch(_){}
+    try{ if(window.renderTopThree) window.renderTopThree(); }catch(_){}
+  };
+
+  // Ensure upload persists id/createdAt
+  if(typeof window.uploadProduct === 'function'){
+    var _up = window.uploadProduct;
+    window.uploadProduct = async function(){
+      var before = Array.isArray(window.products)? window.products.length : 0;
+      await _up();
+      var arr = Array.isArray(window.products)? window.products : [];
+      if(arr.length > before){
+        var last = arr[arr.length-1] || {};
+        if(!last.id) last.id = Date.now();
+        if(!last.createdAt) last.createdAt = Date.now();
+        writeSaved(arr);
+        try{ if(window.renderTopThree) window.renderTopThree(); }catch(_){}
+      }
+    };
+  }
+
+  // Trending: always use products (or demo if empty)
+  (function(){
+    var _rt = window.renderTopThree;
+    window.renderTopThree = function(){
+      try{
+        var el = document.getElementById('topThree'); if(!el) return;
+        el.innerHTML = '';
+        var list = Array.isArray(window.products)? window.products.slice() : [];
+        if(!list.length && Array.isArray(window.DEFAULT_PRODUCTS)) list = window.DEFAULT_PRODUCTS.slice();
+        if(!list.length) return;
+        var now = Date.now();
+        list.forEach(function(p){ if(!p.createdAt) p.createdAt = (typeof p.id==='number'? p.id : now); });
+        list.sort(function(a,b){
+          var la=(window.likeCounts&&window.likeCounts[a.id])||0, lb=(window.likeCounts&&window.likeCounts[b.id])||0;
+          var da=(window.dislikeCounts&&window.dislikeCounts[a.id])||0, db=(window.dislikeCounts&&window.dislikeCounts[b.id])||0;
+          var ageA=Math.max(1,(now-(a.createdAt||now))/86400000);
+          var ageB=Math.max(1,(now-(b.createdAt||now))/86400000);
+          return (lb-db)+5/ageB - ((la-da)+5/ageA);
+        });
+        list.slice(0,3).forEach(function(item){
+          var card=document.createElement('div'); card.className='small-card';
+          var img=document.createElement('img'); img.src=item.image||''; img.alt=item.name||''; card.appendChild(img);
+          card.addEventListener('click', function(){ if(window.viewProduct) window.viewProduct(item); });
+          el.appendChild(card);
+        });
+      }catch(e){ try{ _rt && _rt(); }catch(_){} }
+    };
+  })();
+
+  // Persist on unload, hydrate early
+  window.addEventListener('beforeunload', function(){ try{ writeSaved(Array.isArray(window.products)? window.products : []); }catch(_){} });
+  if(document.readyState !== 'loading'){ try{ window.loadProducts(); }catch(_){} }
+  else { document.addEventListener('DOMContentLoaded', function(){ try{ window.loadProducts(); }catch(_){} }); }
+})();
+</script>
+
+
+<!-- R12 FINAL OVERRIDE (2025-11-06)
+     Fixes:
+     - Products persist across refresh (localStorage + cookie + window.name fallback)
+     - Trending uses saved products immediately (no demo-only)
+     - Clear All truly empties (no demo reinsertion)
+     - Upload ensures id/createdAt then saves
+-->
+<script>
+(function(){
+  var LS = (window.LS_KEYS && window.LS_KEYS.PRODUCTS) || 'daudProducts';
+  var NAME_PREFIX = 'PROD:';
+
+  // base64 helpers
+  function b64e(s){ try{ return btoa(unescape(encodeURIComponent(s))); }catch(_){ try{ return btoa(s); }catch(__){ return ''; } } }
+  function b64d(s){ try{ return decodeURIComponent(escape(atob(s||''))); }catch(_){ try{ return atob(s||''); }catch(__){ return '[]'; } } }
+
+  // cookie fallback (Storage may be defined in page)
+  function setCookie(name, value, days){
+    try{ var d=new Date(); d.setTime(d.getTime()+days*24*60*60*1000); document.cookie=name+"="+encodeURIComponent(value)+";expires="+d.toUTCString()+";path=/"; }catch(_){}
+  }
+  function getCookie(name){
+    try{
+      var cname=name+"="; var arr=document.cookie.split(';');
+      for(var i=0;i<arr.length;i++){ var c=arr[i].trim(); if(c.indexOf(cname)===0) return decodeURIComponent(c.substring(cname.length)); }
+    }catch(_){}
+    return null;
+  }
+
+  function readSaved(){
+    // 1) localStorage
+    try{
+      var v = localStorage.getItem(LS);
+      if(v){ var arr = JSON.parse(v); if(Array.isArray(arr)) return arr; }
+    }catch(_){}
+    // 2) cookie
+    try{
+      var cv = getCookie(LS);
+      if(cv){ var a = JSON.parse(cv); if(Array.isArray(a)) return a; }
+    }catch(_){}
+    // 3) window.name
+    try{
+      if(window.name && window.name.indexOf(NAME_PREFIX)===0){
+        var json = b64d(window.name.slice(NAME_PREFIX.length));
+        var arr2 = JSON.parse(json||'[]'); if(Array.isArray(arr2)) return arr2;
+      }
+    }catch(_){}
+    return [];
+  }
+
+  function writeSaved(arr){
+    var json = JSON.stringify(arr||[]);
+    try{ localStorage.setItem(LS, json); }catch(_){}
+    try{ setCookie(LS, json, 365); }catch(_){}
+    try{ window.name = NAME_PREFIX + b64e(json); }catch(_){}
+  }
+
+  // Strong override: disable remote overwrite
+  window.AUTO_FETCH_LOCAL_PRODUCTS = false;
+
+  window.loadProducts = function(){
+    var local = readSaved();
+    if(Array.isArray(local) && local.length){
+      window.products = local.slice();
+    }else{
+      window.products = Array.isArray(window.DEFAULT_PRODUCTS) ? window.DEFAULT_PRODUCTS.slice() : (Array.isArray(window.products)? window.products : []);
+    }
+    try{ if(window.updateProductsUI) window.updateProductsUI(); else if(window.renderProducts) window.renderProducts(1); }catch(_){}
+    try{ if(window.renderTopThree) window.renderTopThree(); }catch(_){}
+  };
+
+  window.saveProducts = function(){
+    var arr = Array.isArray(window.products) ? window.products : [];
+    writeSaved(arr);
+    try{ if(window.updateProductsUI) window.updateProductsUI(); else if(window.renderProducts) window.renderProducts(1); }catch(_){}
+    try{ if(window.renderTopThree) window.renderTopThree(); }catch(_){}
+  };
+
+  // Clear All should truly empty (no demo reinsert)
+  window.clearAllProducts = function(){
+    try{ localStorage.removeItem(LS); }catch(_){}
+    try{ setCookie(LS, "", -1); }catch(_){}
+    try{ if(window.name && window.name.indexOf(NAME_PREFIX)===0) window.name=''; }catch(_){}
+    window.products = [];
+    try{ if(window.updateProductsUI) window.updateProductsUI(); else if(window.renderProducts) window.renderProducts(1); }catch(_){}
+    try{ if(window.renderTopThree) window.renderTopThree(); }catch(_){}
+    try{ if(window.toast) window.toast('All products cleared'); }catch(_){}
+  };
+
+  // Make sure uploading persists & has createdAt/id
+  if(typeof window.uploadProduct === 'function'){
+    var _up = window.uploadProduct;
+    window.uploadProduct = async function(){
+      var before = Array.isArray(window.products) ? window.products.length : 0;
+      await _up();
+      try{
+        var arr = Array.isArray(window.products) ? window.products : [];
+        if(arr.length > before){
+          var last = arr[arr.length-1] || {};
+          if(!last.id) last.id = Date.now();
+          if(!last.createdAt) last.createdAt = Date.now();
+          writeSaved(arr);
+          if(window.renderTopThree) window.renderTopThree();
+        }
+      }catch(_){}
+    };
+  }
+
+  // Trending must use saved products immediately
+  (function(){
+    var _rt = window.renderTopThree;
+    window.renderTopThree = function(){
+      try{
+        var el = document.getElementById('topThree'); if(!el) return;
+        el.innerHTML='';
+        var list = Array.isArray(window.products) ? window.products.slice() : [];
+        if(!list.length && Array.isArray(window.DEFAULT_PRODUCTS)) list = window.DEFAULT_PRODUCTS.slice();
+        if(!list.length) return;
+        var now = Date.now();
+        function score(p){
+          var id = p && p.id;
+          var like = (window.likeCounts && window.likeCounts[id]) || 0;
+          var dislike = (window.dislikeCounts && window.dislikeCounts[id]) || 0;
+          var ts = Number(p && (p.createdAt || (typeof id==='number' ? id : 0))) || 0;
+          var age = ts ? Math.max(1, (now - ts)/86400000) : 90;
+          return (like - dislike) + 5/age;
+        }
+        list.sort(function(a,b){ return score(b)-score(a); });
+        list.slice(0,3).forEach(function(item){
+          var card = document.createElement('div'); card.className='small-card';
+          var img = document.createElement('img'); img.src=item.image||''; img.alt=item.name||'';
+          card.appendChild(img);
+          card.addEventListener('click', function(){ if(window.viewProduct) window.viewProduct(item); });
+          el.appendChild(card);
+        });
+      }catch(e){ try{ if(_rt) _rt(); }catch(__){} }
+    };
+  })();
+
+  // Persist on unload
+  window.addEventListener('beforeunload', function(){
+    try{ writeSaved(Array.isArray(window.products)? window.products : []); }catch(_){}
+  });
+
+  // Boot
+  if(document.readyState!=='loading'){ try{ window.loadProducts(); }catch(_){ } }
+  else { document.addEventListener('DOMContentLoaded', function(){ try{ window.loadProducts(); }catch(_){ } }); }
+
+  // Ensure like/dislike refresh also bumps trending
+  try{
+    var _saveLikeCounts = window.saveLikeCounts;
+    window.saveLikeCounts = function(){
+      try{ if(_saveLikeCounts) _saveLikeCounts(); }catch(_){}
+      try{ if(window.renderTopThree) window.renderTopThree(); }catch(_){}
+    };
+  }catch(_){}
+
+})();
+</script>
+
+
+<!-- REMOTE SYNC PATCH (for Vercel) — remote is source of truth -->
+<script>
+(function(){
+  // =============== CONFIG ===============
+  // Set your remote JSON URL (same-origin recommended):
+  window.REMOTE_PRODUCTS_URL = window.REMOTE_PRODUCTS_URL || "products.json";
+  // =====================================
+
+  // Remote-first: ignore local fallbacks except simple cache
+  async function fetchRemote(){
+    try{
+      const res = await fetch(window.REMOTE_PRODUCTS_URL + "?_=" + Date.now(), { cache: "no-store" });
+      if(!res.ok) return;
+      const data = await res.json();
+      const remoteArr = Array.isArray(data) ? data : (data && data.products) || [];
+      if(!Array.isArray(remoteArr)) return;
+      window.products = remoteArr.slice();
+      try { if(window.updateProductsUI) updateProductsUI(); else if(window.renderProducts) renderProducts(1); } catch(_){}
+      try { if(window.renderTopThree) renderTopThree(); } catch(_){}
+    }catch(e){ console.warn("Remote fetch failed", e); }
+  }
+
+  // Neutralize local-first overrides from previous patches
+  window.AUTO_FETCH_LOCAL_PRODUCTS = true;
+  window.loadProducts = function(){ return fetchRemote(); };
+  window.saveProducts = function(){ /* remote system manages persistence; keep no-op */ };
+
+  // After important actions, re-pull from remote to reflect changes done by backend
+  function hookAndRefresh(name){
+    try{
+      const prev = window[name];
+      window[name] = async function(){
+        let r;
+        if(typeof prev === "function"){ r = await prev.apply(this, arguments); }
+        await fetchRemote();
+        return r;
+      };
+    }catch(_){}
+  }
+  ["uploadProduct", "deleteProduct", "clearAllProducts", "importProductsJson"].forEach(hookAndRefresh);
+
+  // Kick on load
+  if(document.readyState !== "loading"){ fetchRemote(); }
+  else { document.addEventListener("DOMContentLoaded", fetchRemote); }
+  window.addEventListener("load", fetchRemote);
+})();
+</script>
